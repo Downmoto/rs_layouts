@@ -1,6 +1,5 @@
 <script lang="ts">
     import Window from '$lib/rsl/Window.svelte'
-	import RsLayout from '$lib/rsl/RsLayout.svelte';
 </script>
 
 <main>
@@ -8,12 +7,9 @@
 </main>
 
 <style>
-    /* main {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    main {
         height: 100vh; 
-    } */
+    }
 
     :global(body) {
         margin: 0;
