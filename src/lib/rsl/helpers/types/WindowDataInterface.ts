@@ -1,12 +1,13 @@
-export interface WindowData{
+export type WindowData = {
     id: string
     panes: string[]
     topLeft: Point
     botRight: Point
+    zIndex: number
 }
 
 
-type Point = {
+export type Point = {
     x: number,
     y: number
 }

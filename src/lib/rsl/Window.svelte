@@ -3,13 +3,15 @@
 	import CloseSvg from './helpers/types/svgs/CloseSVG.svelte';
 	import ResizeSvg from './helpers/types/svgs/ResizeSVG.svelte';
 
-	// dummy data
-	let window: WindowData = $state({
-		id: '1',
-		panes: [],
-		topLeft: { x: 100, y: 100 },
-		botRight: { x: 200, y: 200 }
-	});
+	let {
+		window,
+		onRemove,
+		onClick
+	}: {
+		window: WindowData;
+		onRemove: Function;
+		onClick: Function;
+	} = $props();
 
 	let moving = false;
 	let resizing = false;
@@ -20,6 +22,14 @@
 	let initialBotRight = { x: 0, y: 0 };
 	let initialWidth = 0;
 	let initialHeight = 0;
+
+	function handleOnRemove() {
+		onRemove(window.id);
+	}
+
+	function handleOnClick() {
+		onClick(window.id);
+	}
 
 	function onMouseDownHeader(e: MouseEvent) {
 		moving = true;
@@ -74,33 +84,25 @@
 <div
 	class="window"
 	style="left: {window.topLeft.x}px; top: {window.topLeft.y}px; width: {window.botRight.x -
-		window.topLeft.x}px; height: {window.botRight.y - window.topLeft.y}px;"
+		window.topLeft.x}px; height: {window.botRight.y -
+		window.topLeft.y}px; z-index: {window.zIndex};"
+	onmousedown={handleOnClick}
+	role="none"
+	tabindex="-1"
 >
 	<!-- HEADER -->
-	<div
-		class="window-header"
-		onmousedown={onMouseDownHeader}
-		aria-label="window header"
-		role="toolbar"
-		tabindex="-1"
-	>
+	<div class="window-header" onmousedown={onMouseDownHeader} role="none" tabindex="-1">
 		<div class="panes"></div>
 		<div class="window-controls">
-			<div class="close-btn">
+			<button class="close-btn" onclick={handleOnRemove}>
 				<CloseSvg />
-			</div>
+			</button>
 		</div>
 	</div>
 	<!-- CONTENT -->
 	<div class="content"></div>
 	<!-- RESIZE -->
-	<div
-		class="resize"
-		onmousedown={onMouseDownResize}
-		aria-label="window resize"
-		role="toolbar"
-		tabindex="-1"
-	>
+	<div class="resize" onmousedown={onMouseDownResize} role="none" tabindex="-1">
 		<ResizeSvg />
 	</div>
 </div>
@@ -126,6 +128,16 @@
 		right: 0;
 		position: absolute;
 		padding-right: 2px;
+	}
+
+	.close-btn {
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.resize {
