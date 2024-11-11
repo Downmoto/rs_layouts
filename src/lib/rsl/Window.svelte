@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { WindowData } from './helpers/types/WindowDataInterface.js';
-	import CloseSvg from './helpers/types/svgs/CloseSVG.svelte';
-	import ResizeSvg from './helpers/types/svgs/ResizeSVG.svelte';
+	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
+	import ResizeSvg from './helpers/svgs/ResizeSVG.svelte';
 
 	let {
 		window,
