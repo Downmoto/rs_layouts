@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { v4 as uuidv4 } from 'uuid';
-	import type { WindowData } from './helpers/types/WindowDataInterface.js';
+	import type { WindowData } from './helpers/types/WindowData.js';
 	import Window from './Window.svelte';
 
 	let windows: WindowData[] = $state([]);
-    let maxZIndex = 0;
+	let maxZIndex = 0;
 
 	function createWindow() {
 		windows.push({
@@ -12,7 +12,7 @@
 			panes: [],
 			topLeft: { x: 0, y: 0 },
 			botRight: { x: 100, y: 100 }, // minimum value for a window size
-            zIndex: ++maxZIndex
+			zIndex: ++maxZIndex
 		});
 	}
 
@@ -26,17 +26,17 @@
 		});
 	}
 
-    function bringToFront(id: string) {
+	function bringToFront(id: string) {
 		const window = windows.find((w) => w.id === id);
 		if (window) {
-			window.zIndex = ++maxZIndex; 
+			window.zIndex = ++maxZIndex;
 		}
 	}
 </script>
 
 <div class="window-manager">
 	{#each windows as window (window.id)}
-		<Window {window} onRemove={removeWindow} onClick={bringToFront}/>
+		<Window {window} onRemove={removeWindow} onClick={bringToFront} />
 	{/each}
 </div>
 <button onclick={createWindow}>click me</button>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { WindowData } from './helpers/types/WindowDataInterface.js';
+	import type { WindowData } from './helpers/types/WindowData.js';
 	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
 	import ResizeSvg from './helpers/svgs/ResizeSVG.svelte';
 
@@ -83,9 +83,12 @@
 
 <div
 	class="window"
-	style="left: {window.topLeft.x}px; top: {window.topLeft.y}px; width: {window.botRight.x -
-		window.topLeft.x}px; height: {window.botRight.y -
-		window.topLeft.y}px; z-index: {window.zIndex};"
+	style="
+		left: {window.topLeft.x}px; 
+		top: {window.topLeft.y}px; 
+		width: {window.botRight.x - window.topLeft.x}px; 
+		height: {window.botRight.y - window.topLeft.y}px; 
+		z-index: {window.zIndex};"
 	onmousedown={handleOnClick}
 	role="none"
 	tabindex="-1"
