@@ -1,14 +1,18 @@
 <script lang="ts">
 	import type { WindowData } from './helpers/types/WindowData.js';
+	import type { WindowOptions } from './helpers/options/windowOptions.js';
 	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
 	import ResizeSvg from './helpers/svgs/ResizeSVG.svelte';
+	import { showGrid } from './helpers/state/showGrid.svelte.js';
 
 	let {
 		win = $bindable(),
+		winOptions,
 		onRemove,
 		onClick
 	}: {
 		win: WindowData;
+		winOptions: WindowOptions;
 		onRemove: Function;
 		onClick: Function;
 	} = $props();
@@ -33,6 +37,7 @@
 
 	function onMouseDownHeader(e: MouseEvent) {
 		moving = true;
+		showGrid.show = true;
 		startX = e.clientX;
 		startY = e.clientY;
 		initialTopLeft = { ...win.topLeft };
@@ -42,6 +47,7 @@
 
 	function onMouseDownResize(e: MouseEvent) {
 		resizing = true;
+		showGrid.show = true;
 		startX = e.clientX;
 		startY = e.clientY;
 		initialBotRight = { ...win.botRight };
@@ -51,7 +57,6 @@
 		if (moving) {
 			const deltaX = e.clientX - startX;
 			const deltaY = e.clientY - startY;
-
 			// Update both topLeft and botRight to maintain size
 			win.topLeft.x = initialTopLeft.x + deltaX;
 			win.topLeft.y = initialTopLeft.y + deltaY;
@@ -66,11 +71,11 @@
 			win.botRight.y = initialBotRight.y + deltaY;
 
 			// Minimum size constraints
-			if (win.botRight.x - win.topLeft.x < 100) {
-				win.botRight.x = win.topLeft.x + 100;
+			if (win.botRight.x - win.topLeft.x < winOptions.minWidth) {
+				win.botRight.x = win.topLeft.x + winOptions.minWidth;
 			}
-			if (win.botRight.y - win.topLeft.y < 100) {
-				win.botRight.y = win.topLeft.y + 100;
+			if (win.botRight.y - win.topLeft.y < winOptions.minHeight) {
+				win.botRight.y = win.topLeft.y + winOptions.minHeight;
 			}
 		}
 	}
@@ -78,6 +83,7 @@
 	function onMouseUp() {
 		moving = false;
 		resizing = false;
+		showGrid.show = false;
 	}
 </script>
 

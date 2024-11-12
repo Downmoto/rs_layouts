@@ -1,24 +1,32 @@
 <script lang="ts">
-	import Grid from '$lib/rsl/Grid.svelte';
 	import type { GridOptions } from '$lib/rsl/helpers/options/girdOptions.js';
-	import RsLayout from '$lib/rsl/RsLayout.svelte';
-	import Window from '$lib/rsl/Window.svelte';
-	import WindowManager from '$lib/rsl/WindowManager.svelte';
 	import { onMount } from 'svelte';
+	import RsLayout from '$lib/rsl/RsLayout.svelte';
+	import type { WindowOptions } from '$lib/rsl/helpers/options/windowOptions.js';
+	import type { WindowManagerOptions } from '$lib/rsl/helpers/options/windowManagerOptions.js';
 
 	let gridOptions: GridOptions = {
-		rows: 10,
-		columns: 10,
-		gap: 10
+		rows: 5,
+		columns: 20,
+		gap: 14,
+		transitionDuration: 0,
+
 	};
 
-	onMount(() => {
-		console.log(devicePixelRatio);
-	});
+	let windowOptions: WindowOptions = {
+		minWidth: 300,
+		minHeight: 100
+	}
+
+	let windowManagerOptions: WindowManagerOptions = {
+		windowSpawnPoint: {x: 100, y: 200}
+	}
+
+
 </script>
 
 <main>
-	<RsLayout {gridOptions} />
+	<RsLayout {gridOptions} {windowOptions} {windowManagerOptions}/>
 </main>
 
 <style>
@@ -28,5 +36,6 @@
 
 	:global(body) {
 		margin: 0;
+		overflow: hidden;
 	}
 </style>

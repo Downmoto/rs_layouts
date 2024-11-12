@@ -1,7 +1,17 @@
 <script lang="ts">
-	import { v4 as uuidv4 } from 'uuid';
 	import type { WindowData } from './helpers/types/WindowData.js';
+	import type { WindowOptions } from './helpers/options/windowOptions.js';
+	import type { WindowManagerOptions } from './helpers/options/windowManagerOptions.js';
+	import { v4 as uuidv4 } from 'uuid';
 	import Window from './Window.svelte';
+
+	let {
+		winOptions,
+		winManOptions,
+	}: {
+		winOptions: WindowOptions;
+		winManOptions: WindowManagerOptions;
+	} = $props();
 
 	let windows: WindowData[] = $state([]);
 	let maxZIndex = 0;
@@ -10,13 +20,16 @@
 		windows.push({
 			id: uuidv4(),
 			panes: [],
-			topLeft: { x: 0, y: 0 },
-			botRight: { x: 100, y: 100 }, // minimum value for a window size
+			topLeft: winManOptions.windowSpawnPoint,
+			botRight: {
+				x: winOptions.minWidth + winManOptions.windowSpawnPoint.x,
+				y: winOptions.minHeight + winManOptions.windowSpawnPoint.y
+			}, // minimum value for a window size
 			zIndex: ++maxZIndex
 		});
 	}
 
-	function removeWindow(id: string) {
+	function EventRemoveWindow(id: string) {
 		windows.filter((value, index) => {
 			if (value.id === id) {
 				windows.splice(index, 1);
@@ -26,7 +39,7 @@
 		});
 	}
 
-	function bringToFront(id: string) {
+	function EventBringToFront(id: string) {
 		const window = windows.find((w) => w.id === id);
 		if (window) {
 			window.zIndex = ++maxZIndex;
@@ -36,7 +49,12 @@
 
 <div class="window-manager">
 	{#each windows as w, index (w.id)}
-		<Window bind:win={windows[index]} onRemove={removeWindow} onClick={bringToFront} />
+		<Window
+			{winOptions}
+			bind:win={windows[index]}
+			onRemove={EventRemoveWindow}
+			onClick={EventBringToFront}
+		/>
 	{/each}
 </div>
 <button onclick={createWindow}>click me</button>
