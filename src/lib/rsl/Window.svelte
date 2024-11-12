@@ -4,11 +4,11 @@
 	import ResizeSvg from './helpers/svgs/ResizeSVG.svelte';
 
 	let {
-		window,
+		win = $bindable(),
 		onRemove,
 		onClick
 	}: {
-		window: WindowData;
+		win: WindowData;
 		onRemove: Function;
 		onClick: Function;
 	} = $props();
@@ -24,27 +24,27 @@
 	let initialHeight = 0;
 
 	function handleOnRemove() {
-		onRemove(window.id);
+		onRemove(win.id);
 	}
 
 	function handleOnClick() {
-		onClick(window.id);
+		onClick(win.id);
 	}
 
 	function onMouseDownHeader(e: MouseEvent) {
 		moving = true;
 		startX = e.clientX;
 		startY = e.clientY;
-		initialTopLeft = { ...window.topLeft };
-		initialWidth = window.botRight.x - window.topLeft.x;
-		initialHeight = window.botRight.y - window.topLeft.y;
+		initialTopLeft = { ...win.topLeft };
+		initialWidth = win.botRight.x - win.topLeft.x;
+		initialHeight = win.botRight.y - win.topLeft.y;
 	}
 
 	function onMouseDownResize(e: MouseEvent) {
 		resizing = true;
 		startX = e.clientX;
 		startY = e.clientY;
-		initialBotRight = { ...window.botRight };
+		initialBotRight = { ...win.botRight };
 	}
 
 	function onMouseMove(e: MouseEvent) {
@@ -53,24 +53,24 @@
 			const deltaY = e.clientY - startY;
 
 			// Update both topLeft and botRight to maintain size
-			window.topLeft.x = initialTopLeft.x + deltaX;
-			window.topLeft.y = initialTopLeft.y + deltaY;
-			window.botRight.x = window.topLeft.x + initialWidth;
-			window.botRight.y = window.topLeft.y + initialHeight;
+			win.topLeft.x = initialTopLeft.x + deltaX;
+			win.topLeft.y = initialTopLeft.y + deltaY;
+			win.botRight.x = win.topLeft.x + initialWidth;
+			win.botRight.y = win.topLeft.y + initialHeight;
 		}
 		if (resizing) {
 			const deltaX = e.clientX - startX;
 			const deltaY = e.clientY - startY;
 
-			window.botRight.x = initialBotRight.x + deltaX;
-			window.botRight.y = initialBotRight.y + deltaY;
+			win.botRight.x = initialBotRight.x + deltaX;
+			win.botRight.y = initialBotRight.y + deltaY;
 
 			// Minimum size constraints
-			if (window.botRight.x - window.topLeft.x < 100) {
-				window.botRight.x = window.topLeft.x + 100;
+			if (win.botRight.x - win.topLeft.x < 100) {
+				win.botRight.x = win.topLeft.x + 100;
 			}
-			if (window.botRight.y - window.topLeft.y < 100) {
-				window.botRight.y = window.topLeft.y + 100;
+			if (win.botRight.y - win.topLeft.y < 100) {
+				win.botRight.y = win.topLeft.y + 100;
 			}
 		}
 	}
@@ -82,19 +82,19 @@
 </script>
 
 <div
-	class="window"
+	class="wi"
 	style="
-		left: {window.topLeft.x}px; 
-		top: {window.topLeft.y}px; 
-		width: {window.botRight.x - window.topLeft.x}px; 
-		height: {window.botRight.y - window.topLeft.y}px; 
-		z-index: {window.zIndex};"
+		left: {win.topLeft.x}px; 
+		top: {win.topLeft.y}px; 
+		width: {win.botRight.x - win.topLeft.x}px; 
+		height: {win.botRight.y - win.topLeft.y}px; 
+		z-index: {win.zIndex};"
 	onmousedown={handleOnClick}
 	role="none"
 	tabindex="-1"
 >
 	<!-- HEADER -->
-	<div class="window-header" onmousedown={onMouseDownHeader} role="none" tabindex="-1">
+	<div class="wi-header" onmousedown={onMouseDownHeader} role="none" tabindex="-1">
 		<div class="panes"></div>
 		<div class="window-controls">
 			<button class="close-btn" onclick={handleOnRemove}>
@@ -103,7 +103,9 @@
 		</div>
 	</div>
 	<!-- CONTENT -->
-	<div class="content"></div>
+	<div class="content">
+		<h1>hi</h1>
+	</div>
 	<!-- RESIZE -->
 	<div class="resize" onmousedown={onMouseDownResize} role="none" tabindex="-1">
 		<ResizeSvg />
@@ -112,7 +114,7 @@
 <svelte:window onmouseup={onMouseUp} onmousemove={onMouseMove} />
 
 <style>
-	.window {
+	.wi {
 		background-color: lightgrey;
 		border: 2px solid #333;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -121,7 +123,7 @@
 		min-width: 100px;
 	}
 
-	.window-header {
+	.wi-header {
 		background-color: rgb(250, 0, 42);
 		height: 30px;
 		user-select: none;
@@ -150,6 +152,6 @@
 		position: absolute;
 		bottom: 0;
 		right: 0;
-		cursor: se-resize; /* Shows a diagonal resize cursor */
+		cursor: se-resize;
 	}
 </style>

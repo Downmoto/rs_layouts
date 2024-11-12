@@ -35,8 +35,15 @@
 </script>
 
 <div class="window-manager">
-	{#each windows as window (window.id)}
-		<Window {window} onRemove={removeWindow} onClick={bringToFront} />
+	{#each windows as w, index (w.id)}
+		<Window bind:win={windows[index]} onRemove={removeWindow} onClick={bringToFront} />
 	{/each}
 </div>
 <button onclick={createWindow}>click me</button>
+
+<style>
+	button {
+		position: absolute;
+	}
+
+</style>

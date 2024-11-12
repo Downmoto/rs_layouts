@@ -2,7 +2,7 @@ import type { GridOptions } from './options/girdOptions.js';
 import type { Cell } from './types/_Cell.js';
 import type { Point } from './types/WindowData.js';
 
-export class virtualGrid {
+export class VirtualGrid {
 	private cells: Cell[] = [];
 	private rows: number;
 	private columns: number;
@@ -14,6 +14,13 @@ export class virtualGrid {
 		this.rows = opts.rows;
 		this.columns = opts.columns;
 		this.gap = opts.gap;
+
+		if (opts.screenHeight === undefined) {
+			opts.screenHeight = 500;
+		}
+		if (opts.screenWidth === undefined) {
+			opts.screenWidth = 500;
+		}
 
 		// Calculate cell dimensions based on screen size, gaps, and grid dimensions
 		this.cellWidth = (opts.screenWidth - (opts.columns - 1) * this.gap) / opts.columns;
