@@ -13,13 +13,13 @@
 	let virtualGrid: VirtualGrid = $state.raw(
 		new VirtualGrid({
 			rows: gridOptions.rows,
-		    columns: gridOptions.columns,
+			columns: gridOptions.columns,
 			gap: gridOptions.gap
 		})
 	);
 </script>
 
 <div class="rs">
-    <WindowManager />
+	<WindowManager />
 	<Grid options={gridOptions} grid={virtualGrid} />
 </div>

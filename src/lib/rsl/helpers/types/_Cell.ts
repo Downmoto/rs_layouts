@@ -1,4 +1,4 @@
-import type { Point } from "./WindowData.js";
+import type { Point } from './WindowData.js';
 
 export type Cell = {
 	topLeft: Point;
