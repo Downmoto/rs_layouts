@@ -8,7 +8,7 @@
 		rows: 20,
 		columns: 20,
 		gap: 3,
-		transitionDuration: 100,
+		transitionDuration: 500,
 
 	};
 

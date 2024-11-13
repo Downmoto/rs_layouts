@@ -2,7 +2,6 @@
 	import type { WindowData } from './helpers/types/WindowData.js';
 	import type { WindowOptions } from './helpers/options/windowOptions.js';
 	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
-	import ResizeSvg from './helpers/svgs/ResizeSVG.svelte';
 	import { showGrid } from './helpers/state/showGrid.svelte.js';
 
 	let {
@@ -37,6 +36,7 @@
 	}
 
 	function onMouseDownHeader(e: MouseEvent) {
+		onClick(win.id)
 		e.stopPropagation();
 		moving = true;
 		showGrid.show = true;
@@ -51,6 +51,7 @@
 		return (e: MouseEvent) => {
 			e.stopPropagation();
 			resizing = true;
+			showGrid.show = true;
 			resizeDirection = direction;
 			startX = e.clientX;
 			startY = e.clientY;

@@ -59,6 +59,7 @@
 		box-sizing: border-box;
 		gap: var(--gap);
 		overflow: hidden;
+		user-select: none;
 	}
 
 	.cell {

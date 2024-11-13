@@ -2,15 +2,18 @@
 	import type { WindowData } from './helpers/types/WindowData.js';
 	import type { WindowOptions } from './helpers/options/windowOptions.js';
 	import type { WindowManagerOptions } from './helpers/options/windowManagerOptions.js';
+	import type { VirtualGrid } from './helpers/virtualGrid.js';
 	import { v4 as uuidv4 } from 'uuid';
 	import Window from './Window.svelte';
 
 	let {
 		winOptions,
 		winManOptions,
+		virtualGrid
 	}: {
 		winOptions: WindowOptions;
 		winManOptions: WindowManagerOptions;
+		virtualGrid: VirtualGrid
 	} = $props();
 
 	let windows: WindowData[] = $state([]);

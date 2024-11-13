@@ -24,6 +24,6 @@
 </script>
 
 <div class="rs">
-	<WindowManager winOptions={windowOptions} winManOptions={windowManagerOptions} />
+	<WindowManager winOptions={windowOptions} winManOptions={windowManagerOptions} {virtualGrid}/>
 	<Grid options={gridOptions} grid={virtualGrid} />
 </div>
