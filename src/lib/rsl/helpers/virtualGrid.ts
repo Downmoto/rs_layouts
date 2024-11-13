@@ -6,8 +6,8 @@ export class VirtualGrid {
 	private rows: number;
 	private columns: number;
 	private gap: number;
-	private cellWidth: number;
-	private cellHeight: number;
+	private cellWidth!: number;
+	private cellHeight!: number;
 
 	constructor(
 		rows: number,
@@ -20,19 +20,14 @@ export class VirtualGrid {
 		this.columns = columns;
 		this.gap = gap;
 
-		if (screenHeight === undefined) {
-			screenHeight = 500;
-		}
-		if (screenWidth === undefined) {
-			screenWidth = 500;
-		}
+		if (screenHeight !== undefined && screenWidth !== undefined) {
+			// Calculate cell dimensions based on screen size, gaps, and grid dimensions
+			this.cellWidth = (screenWidth - (columns - 1) * this.gap) / columns;
+			this.cellHeight = (screenHeight - (rows - 1) * this.gap) / rows;
 
-		// Calculate cell dimensions based on screen size, gaps, and grid dimensions
-		this.cellWidth = (screenWidth - (columns - 1) * this.gap) / columns;
-		this.cellHeight = (screenHeight - (rows - 1) * this.gap) / rows;
-
-		this.validateDimensions();
-		this.initializeGrid();
+			this.validateDimensions();
+			this.initializeGrid();
+		}
 	}
 
 	private validateDimensions() {

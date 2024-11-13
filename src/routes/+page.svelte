@@ -1,20 +1,19 @@
 <script lang="ts">
 	import type { GridOptions } from '$lib/rsl/helpers/options/girdOptions.js';
-	import { onMount } from 'svelte';
-	import RsLayout from '$lib/rsl/RsLayout.svelte';
 	import type { WindowOptions } from '$lib/rsl/helpers/options/windowOptions.js';
 	import type { WindowManagerOptions } from '$lib/rsl/helpers/options/windowManagerOptions.js';
+	import RsLayout from '$lib/rsl/RsLayout.svelte';
 
 	let gridOptions: GridOptions = {
 		rows: 5,
 		columns: 20,
 		gap: 14,
-		transitionDuration: 0,
+		transitionDuration: 100,
 
 	};
 
 	let windowOptions: WindowOptions = {
-		minWidth: 300,
+		minWidth: 100,
 		minHeight: 100
 	}
 

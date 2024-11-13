@@ -17,8 +17,8 @@
 			options.rows,
 			options.columns,
 			options.gap,
-			window.innerWidth,
-			window.innerHeight
+			window.innerWidth,	// safe as first call is onMount with access to window obj
+			window.innerHeight  // safe as first call is onMount with access to window obj
 		);
 	}
 
