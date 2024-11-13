@@ -17,8 +17,9 @@
 		onClick: Function;
 	} = $props();
 
-	let moving = false;
-	let resizing = false;
+	let moving = $state(false);
+	let resizing = $state(false);
+	let resizeDirection: string | null = null;
 
 	let startX = 0;
 	let startY = 0;
@@ -36,6 +37,7 @@
 	}
 
 	function onMouseDownHeader(e: MouseEvent) {
+		e.stopPropagation();
 		moving = true;
 		showGrid.show = true;
 		startX = e.clientX;
@@ -45,12 +47,16 @@
 		initialHeight = win.botRight.y - win.topLeft.y;
 	}
 
-	function onMouseDownResize(e: MouseEvent) {
-		resizing = true;
-		showGrid.show = true;
-		startX = e.clientX;
-		startY = e.clientY;
-		initialBotRight = { ...win.botRight };
+	function startResize(direction: string) {
+		return (e: MouseEvent) => {
+			e.stopPropagation();
+			resizing = true;
+			resizeDirection = direction;
+			startX = e.clientX;
+			startY = e.clientY;
+			initialTopLeft = { ...win.topLeft };
+			initialBotRight = { ...win.botRight };
+		};
 	}
 
 	function onMouseMove(e: MouseEvent) {
@@ -67,8 +73,35 @@
 			const deltaX = e.clientX - startX;
 			const deltaY = e.clientY - startY;
 
-			win.botRight.x = initialBotRight.x + deltaX;
-			win.botRight.y = initialBotRight.y + deltaY;
+			// Adjust resizing based on direction
+			if (
+				resizeDirection === 'right' ||
+				resizeDirection === 'bottom-right' ||
+				resizeDirection === 'top-right'
+			) {
+				win.botRight.x = initialBotRight.x + deltaX;
+			}
+			if (
+				resizeDirection === 'left' ||
+				resizeDirection === 'bottom-left' ||
+				resizeDirection === 'top-left'
+			) {
+				win.topLeft.x = initialTopLeft.x + deltaX;
+			}
+			if (
+				resizeDirection === 'bottom' ||
+				resizeDirection === 'bottom-right' ||
+				resizeDirection === 'bottom-left'
+			) {
+				win.botRight.y = initialBotRight.y + deltaY;
+			}
+			if (
+				resizeDirection === 'top' ||
+				resizeDirection === 'top-right' ||
+				resizeDirection === 'top-left'
+			) {
+				win.topLeft.y = initialTopLeft.y + deltaY;
+			}
 
 			// Minimum size constraints
 			if (win.botRight.x - win.topLeft.x < winOptions.minWidth) {
@@ -88,19 +121,22 @@
 </script>
 
 <div
-	class="wi"
+	class="window {resizing || moving ? 'no-select' : ''}"
 	style="
 		left: {win.topLeft.x}px; 
 		top: {win.topLeft.y}px; 
 		width: {win.botRight.x - win.topLeft.x}px; 
 		height: {win.botRight.y - win.topLeft.y}px; 
-		z-index: {win.zIndex};"
+		z-index: {win.zIndex};
+		
+		--resizeOverflow: {winOptions.resizingZoneOverflow}px;
+		"
 	onmousedown={handleOnClick}
 	role="none"
 	tabindex="-1"
 >
 	<!-- HEADER -->
-	<div class="wi-header" onmousedown={onMouseDownHeader} role="none" tabindex="-1">
+	<div class="window-header" onmousedown={onMouseDownHeader} role="none" tabindex="-1">
 		<div class="panes"></div>
 		<div class="window-controls">
 			<button class="close-btn" onclick={handleOnRemove}>
@@ -109,18 +145,82 @@
 		</div>
 	</div>
 	<!-- CONTENT -->
-	<div class="content">
+	<div class="window-content">
 		<h1>hi</h1>
 	</div>
-	<!-- RESIZE -->
-	<div class="resize" onmousedown={onMouseDownResize} role="none" tabindex="-1">
-		<ResizeSvg />
-	</div>
+	<!-- RESIZE HANDLES -->
+	<div
+		class="resize-handle right"
+		onmousedown={startResize('right')}
+		role="button"
+		aria-label="Resize right"
+		tabindex="0"
+	></div>
+
+	<div
+		class="resize-handle bottom"
+		onmousedown={startResize('bottom')}
+		role="button"
+		aria-label="Resize bottom"
+		tabindex="0"
+	></div>
+
+	<div
+		class="resize-handle bottom-right"
+		onmousedown={startResize('bottom-right')}
+		role="button"
+		aria-label="Resize bottom right corner"
+		tabindex="0"
+	></div>
+
+	<div
+		class="resize-handle left"
+		onmousedown={startResize('left')}
+		role="button"
+		aria-label="Resize left"
+		tabindex="0"
+	></div>
+
+	<div
+		class="resize-handle top"
+		onmousedown={startResize('top')}
+		role="button"
+		aria-label="Resize top"
+		tabindex="0"
+	></div>
+
+	<div
+		class="resize-handle top-right"
+		onmousedown={startResize('top-right')}
+		role="button"
+		aria-label="Resize top right corner"
+		tabindex="0"
+	></div>
+
+	<div
+		class="resize-handle top-left"
+		onmousedown={startResize('top-left')}
+		role="button"
+		aria-label="Resize top left corner"
+		tabindex="0"
+	></div>
+
+	<div
+		class="resize-handle bottom-left"
+		onmousedown={startResize('bottom-left')}
+		role="button"
+		aria-label="Resize bottom left corner"
+		tabindex="0"
+	></div>
 </div>
 <svelte:window onmouseup={onMouseUp} onmousemove={onMouseMove} />
 
 <style>
-	.wi {
+	.no-select {
+		user-select: none;
+	}
+
+	.window {
 		background-color: lightgrey;
 		border: 2px solid #333;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -129,7 +229,7 @@
 		min-width: 100px;
 	}
 
-	.wi-header {
+	.window-header {
 		background-color: rgb(250, 0, 42);
 		height: 30px;
 		user-select: none;
@@ -151,13 +251,75 @@
 		justify-content: center;
 	}
 
-	.resize {
-		width: 15px;
-		height: 15px;
-		padding: 0px 2px 2px 0px;
+	.resize-handle {
 		position: absolute;
-		bottom: 0;
-		right: 0;
+		background: transparent;
+		cursor: pointer;
+	}
+
+	/* Side handles */
+	.right {
+		top: 0;
+		right: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		width: 10px;
+		height: 100%;
+		cursor: e-resize;
+	}
+
+	.left {
+		top: 0;
+		left: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		width: 10px;
+		height: 100%;
+		cursor: w-resize;
+	}
+
+	.bottom {
+		bottom: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		left: 0;
+		width: 100%;
+		height: 10px;
+		cursor: s-resize;
+	}
+
+	.top {
+		top: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		left: 0;
+		width: 100%;
+		height: 10px;
+		cursor: n-resize;
+	}
+
+	/* Corner handles */
+	.bottom-right {
+		width: 10px;
+		height: 10px;
+		bottom: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		right: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
 		cursor: se-resize;
+	}
+
+	.bottom-left {
+		width: 10px;
+		height: 10px;
+		bottom: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		left: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		cursor: sw-resize;
+	}
+
+	.top-right {
+		width: 10px;
+		height: 10px;
+		top: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		right: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		cursor: ne-resize;
+	}
+
+	.top-left {
+		width: 10px;
+		height: 10px;
+		top: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		left: calc(-1 * var(--resizeOverflow)); /* Overflow by --resizeOverflow */
+		cursor: nw-resize;
 	}
 </style>

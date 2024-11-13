@@ -5,16 +5,17 @@
 	import RsLayout from '$lib/rsl/RsLayout.svelte';
 
 	let gridOptions: GridOptions = {
-		rows: 5,
+		rows: 20,
 		columns: 20,
-		gap: 14,
+		gap: 3,
 		transitionDuration: 100,
 
 	};
 
 	let windowOptions: WindowOptions = {
 		minWidth: 100,
-		minHeight: 100
+		minHeight: 100,
+		resizingZoneOverflow: 5
 	}
 
 	let windowManagerOptions: WindowManagerOptions = {

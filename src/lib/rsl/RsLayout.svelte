@@ -16,13 +16,10 @@
 		windowManagerOptions: WindowManagerOptions;
 	} = $props();
 
+
 	// Initial grid with no w & h made and passed to Grid for onMount re-initialization
 	let virtualGrid: VirtualGrid = $state.raw(
-		new VirtualGrid(
-			gridOptions.rows,
-			gridOptions.columns,
-			gridOptions.gap,
-		)
+		new VirtualGrid(gridOptions.rows, gridOptions.columns, gridOptions.gap)
 	);
 </script>
 

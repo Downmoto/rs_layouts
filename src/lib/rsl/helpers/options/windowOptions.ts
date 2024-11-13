@@ -1,4 +1,5 @@
 export interface WindowOptions {
     minWidth: number,
-    minHeight: number
+    minHeight: number,
+    resizingZoneOverflow: number
 }
