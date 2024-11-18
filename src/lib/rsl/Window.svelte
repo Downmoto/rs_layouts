@@ -36,7 +36,7 @@
 	}
 
 	function onMouseDownHeader(e: MouseEvent) {
-		onClick(win.id)
+		onClick(win.id);
 		e.stopPropagation();
 		moving = true;
 		showGrid.show = true;
@@ -115,6 +115,28 @@
 	}
 
 	function onMouseUp() {
+		const width = win.botRight.x - win.topLeft.x;
+		const height = win.botRight.y - win.topLeft.y;
+
+		if (win.topLeft.x < 0) {
+			win.topLeft.x = 0;
+			if (moving) {
+				win.botRight.x = width;
+			}
+		} else if (win.botRight.x > window.innerWidth) {
+			win.botRight.x = window.innerWidth;
+			win.topLeft.x = window.innerWidth - width;
+		}
+
+		if (win.topLeft.y < 0) {
+			win.topLeft.y = 0;
+			if (moving) {
+				win.botRight.y = height;
+			}
+		} else if (win.botRight.y > window.innerHeight) {
+			win.botRight.y = window.innerHeight;
+			win.topLeft.y = window.innerHeight - height;
+		}
 		moving = false;
 		resizing = false;
 		showGrid.show = false;

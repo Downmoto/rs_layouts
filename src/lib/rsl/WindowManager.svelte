@@ -5,15 +5,20 @@
 	import type { VirtualGrid } from './helpers/virtualGrid.js';
 	import { v4 as uuidv4 } from 'uuid';
 	import Window from './Window.svelte';
+	import Grid from './Grid.svelte';
+	import type { GridOptions } from './helpers/options/girdOptions.js';
+	import type { Cell } from './helpers/types/_Cell.js';
 
 	let {
 		winOptions,
 		winManOptions,
-		virtualGrid
+		virtualGrid,
+		gridOptions
 	}: {
 		winOptions: WindowOptions;
 		winManOptions: WindowManagerOptions;
-		virtualGrid: VirtualGrid
+		virtualGrid: VirtualGrid;
+		gridOptions: GridOptions
 	} = $props();
 
 	let windows: WindowData[] = $state([]);
@@ -50,6 +55,8 @@
 	}
 </script>
 
+<button onclick={createWindow}>click me</button>
+<Grid options={gridOptions} grid={virtualGrid} />
 <div class="window-manager">
 	{#each windows as w, index (w.id)}
 		<Window
@@ -60,7 +67,6 @@
 		/>
 	{/each}
 </div>
-<button onclick={createWindow}>click me</button>
 
 <style>
 	button {

@@ -64,7 +64,7 @@
 
 	.cell {
 		background-color: lightgray;
-		border: 1px solid #ccc; /* Optional for visual separation */
+		border: 1px solid #ccc; 
 		box-sizing: border-box;
 		overflow: hidden;
 	}
