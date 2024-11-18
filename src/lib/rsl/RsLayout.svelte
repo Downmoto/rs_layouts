@@ -1,31 +1,40 @@
 <script lang="ts">
-	import type { GridOptions } from './helpers/options/girdOptions.js';
-	import type { WindowManagerOptions } from './helpers/options/windowManagerOptions.js';
-	import type { WindowOptions } from './helpers/options/windowOptions.js';
-	import { VirtualGrid } from './helpers/virtualGrid.js';
-	import WindowManager from './WindowManager.svelte';
+	import type { GridConfig } from './helpers/config/girdConfig.js';
+	import type { WindowManagerConfig } from './helpers/config/windowManagerConfig.js';
+	import type { WindowConfig } from './helpers/config/windowConfig.js';
+	import type { WindowData } from './helpers/types/WindowData.js';
+	import { setVirtualGridState } from './helpers/state/virtualGridState.svelte.js';
+	import { setWindowManagerState } from './helpers/state/windowManagerState.svelte.js';
+	import Grid from './Grid.svelte';
+	import Window from './Window.svelte';
 
 	let {
-		gridOptions,
-		windowOptions,
-		windowManagerOptions
+		gridConfig,
+		windowConfig,
+		windowManagerConfig
 	}: {
-		gridOptions: GridOptions;
-		windowOptions: WindowOptions;
-		windowManagerOptions: WindowManagerOptions;
+		gridConfig: GridConfig;
+		windowConfig: WindowConfig;
+		windowManagerConfig: WindowManagerConfig;
 	} = $props();
 
 	// Initial grid with no w & h made and passed to Grid for onMount re-initialization
-	let virtualGrid: VirtualGrid = $state.raw(
-		new VirtualGrid(gridOptions.rows, gridOptions.columns, gridOptions.gap)
-	);
+	let windowManager = setWindowManagerState(windowConfig, windowManagerConfig);
+	let windows: WindowData[] = $derived(windowManager.getWindows())
+	setVirtualGridState(gridConfig.rows, gridConfig.columns, gridConfig.gap);
 </script>
 
 <div class="rs">
-	<WindowManager
-		winOptions={windowOptions}
-		winManOptions={windowManagerOptions}
-		{virtualGrid}
-		{gridOptions}
-	/>
+	<button onclick={() => windowManager.createWindow()}> click me </button>
+	<Grid config={gridConfig} />
+	<div class="window-manager">
+		{#each windows as w, index (w.id)}
+			<Window 
+			{windowConfig}
+			bind:win={windows[index]}
+			onRemove={() => windowManager.removeWindow(w.id)}
+			onClick={() => windowManager.bringWindowToFront(w.id)}
+			/>
+		{/each}
+	</div>
 </div>

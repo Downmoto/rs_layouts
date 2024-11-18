@@ -1,17 +1,17 @@
 <script lang="ts">
 	import type { WindowData } from './helpers/types/WindowData.js';
-	import type { WindowOptions } from './helpers/options/windowOptions.js';
+	import type { WindowConfig } from './helpers/config/windowConfig.js';
 	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
-	import { showGrid } from './helpers/state/showGrid.svelte.js';
+	import { getVirtualGridState } from './helpers/state/virtualGridState.svelte.js';
 
 	let {
 		win = $bindable(),
-		winOptions,
+		windowConfig,
 		onRemove,
 		onClick
 	}: {
 		win: WindowData;
-		winOptions: WindowOptions;
+		windowConfig: WindowConfig;
 		onRemove: Function;
 		onClick: Function;
 	} = $props();
@@ -19,6 +19,7 @@
 	let moving = $state(false);
 	let resizing = $state(false);
 	let resizeDirection: string | null = null;
+	let grid = getVirtualGridState()
 
 	let startX = 0;
 	let startY = 0;
@@ -39,7 +40,7 @@
 		onClick(win.id);
 		e.stopPropagation();
 		moving = true;
-		showGrid.show = true;
+		grid.show = true;
 		startX = e.clientX;
 		startY = e.clientY;
 		initialTopLeft = { ...win.topLeft };
@@ -51,7 +52,7 @@
 		return (e: MouseEvent) => {
 			e.stopPropagation();
 			resizing = true;
-			showGrid.show = true;
+			grid.show = true;
 			resizeDirection = direction;
 			startX = e.clientX;
 			startY = e.clientY;
@@ -105,11 +106,11 @@
 			}
 
 			// Minimum size constraints
-			if (win.botRight.x - win.topLeft.x < winOptions.minWidth) {
-				win.botRight.x = win.topLeft.x + winOptions.minWidth;
+			if (win.botRight.x - win.topLeft.x < windowConfig.minWidth) {
+				win.botRight.x = win.topLeft.x + windowConfig.minWidth;
 			}
-			if (win.botRight.y - win.topLeft.y < winOptions.minHeight) {
-				win.botRight.y = win.topLeft.y + winOptions.minHeight;
+			if (win.botRight.y - win.topLeft.y < windowConfig.minHeight) {
+				win.botRight.y = win.topLeft.y + windowConfig.minHeight;
 			}
 		}
 	}
@@ -139,7 +140,7 @@
 		}
 		moving = false;
 		resizing = false;
-		showGrid.show = false;
+		grid.show = false;
 	}
 </script>
 
@@ -152,7 +153,7 @@
 		height: {win.botRight.y - win.topLeft.y}px; 
 		z-index: {win.zIndex};
 		
-		--resizeOverflow: {winOptions.resizingZoneOverflow}px;
+		--resizeOverflow: {windowConfig.resizingZoneOverflow}px;
 		"
 	onmousedown={handleOnClick}
 	role="none"

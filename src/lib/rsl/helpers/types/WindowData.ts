@@ -1,4 +1,4 @@
-import type { Cell } from "./_Cell.js";
+import type { Cell } from "./Cell.js";
 
 export type WindowData = {
 	id: string;

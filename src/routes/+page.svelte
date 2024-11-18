@@ -1,10 +1,11 @@
 <script lang="ts">
-	import type { GridOptions } from '$lib/rsl/helpers/options/girdOptions.js';
-	import type { WindowOptions } from '$lib/rsl/helpers/options/windowOptions.js';
-	import type { WindowManagerOptions } from '$lib/rsl/helpers/options/windowManagerOptions.js';
+	import Grid from '$lib/rsl/Grid.svelte';
+	import type { GridConfig } from '$lib/rsl/helpers/config/girdConfig.js';
+	import type { WindowConfig } from '$lib/rsl/helpers/config/windowConfig.js';
+	import type { WindowManagerConfig } from '$lib/rsl/helpers/config/windowManagerConfig.js';
 	import RsLayout from '$lib/rsl/RsLayout.svelte';
 
-	let gridOptions: GridOptions = {
+	let gridConfig: GridConfig = {
 		rows: 20,
 		columns: 20,
 		gap: 3,
@@ -12,13 +13,13 @@
 
 	};
 
-	let windowOptions: WindowOptions = {
+	let windowConfig: WindowConfig = {
 		minWidth: 100,
 		minHeight: 100,
 		resizingZoneOverflow: 5
 	}
 
-	let windowManagerOptions: WindowManagerOptions = {
+	let windowManagerConfig: WindowManagerConfig = {
 		windowSpawnPoint: {x: 100, y: 200}
 	}
 
@@ -26,7 +27,7 @@
 </script>
 
 <main>
-	<RsLayout {gridOptions} {windowOptions} {windowManagerOptions}/>
+	<RsLayout {gridConfig} {windowConfig} {windowManagerConfig}/>
 </main>
 
 <style>

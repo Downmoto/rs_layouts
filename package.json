@@ -1,6 +1,19 @@
 {
 	"name": "rs-layouts",
-	"version": "0.0.1",
+	"version": "0.1.1",
+	"description": "Svelte layout library",
+	"keywords": [
+		"svelte",
+		"layout",
+		"ui",
+		"floating windows"
+	],
+	"homepage": "https://github.com/Downmoto/rs_layouts",
+	"author": {
+		"name": "Arad Fadaei",
+		"email": "arad@fadaei.dev",
+		"url": "https://fadaei.dev"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -50,8 +63,5 @@
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.0.0",
 		"vite": "^5.0.11"
-	},
-	"dependencies": {
-		"uuid": "^11.0.3"
 	}
 }

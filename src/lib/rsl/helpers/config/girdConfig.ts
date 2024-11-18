@@ -1,4 +1,4 @@
-export interface GridOptions {
+export interface GridConfig {
 	rows: number;
 	columns: number;
 	gap: number;
