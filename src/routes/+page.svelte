@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Grid from '$lib/rsl/Grid.svelte';
 	import type { GridConfig } from '$lib/rsl/helpers/config/girdConfig.js';
 	import type { WindowConfig } from '$lib/rsl/helpers/config/windowConfig.js';
 	import type { WindowManagerConfig } from '$lib/rsl/helpers/config/windowManagerConfig.js';
+	import { getWindowManagerState } from '$lib/rsl/helpers/state/windowManagerState.svelte.js';
 	import RsLayout from '$lib/rsl/RsLayout.svelte';
 
 	let gridConfig: GridConfig = {
@@ -24,9 +24,11 @@
 	}
 
 
+	let windowManager = getWindowManagerState()
 </script>
 
 <main>
+	<button onclick={() => windowManager.createWindow()} style:position="absolute"> click me </button>
 	<RsLayout {gridConfig} {windowConfig} {windowManagerConfig}/>
 </main>
 

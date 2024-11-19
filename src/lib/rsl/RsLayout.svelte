@@ -25,7 +25,6 @@
 </script>
 
 <div class="rs">
-	<button onclick={() => windowManager.createWindow()}> click me </button>
 	<Grid config={gridConfig} />
 	<div class="window-manager">
 		{#each windows as w, index (w.id)}
