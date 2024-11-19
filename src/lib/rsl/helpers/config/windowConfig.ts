@@ -3,3 +3,5 @@ export interface WindowConfig {
     minHeight: number,
     resizingZoneOverflow: number
 }
+
+// TODO: snap threshold and snappingOnByDefault

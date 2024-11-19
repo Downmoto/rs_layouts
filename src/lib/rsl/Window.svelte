@@ -155,6 +155,7 @@
 			win.topLeft.y = parentHeightConstraint - height; // Maintain height
 		}
 
+		// TODO: Fix snapping jittery ness, maybe add snap threshold
 		// Get the grid cells that the topLeft and botRight points are snapping to
 		const nearestTopLeftCell = grid.getNearestCell(win.topLeft);
 		const nearestBotRightCell = grid.getNearestCell(win.botRight);
