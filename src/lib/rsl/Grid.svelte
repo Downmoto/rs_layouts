@@ -11,31 +11,30 @@
 	let grid: VirtualGrid = getVirtualGridState();
 	let cells: Cell[] = $derived(grid.getCells());
 
-	function updateGrid() {
-		grid.updateGrid(
-			config.rows,
-			config.columns,
-			config.gap,
-			window.innerWidth,
-			window.innerHeight
-		);
+	// svelte-ignore non_reactive_update
+	let containerDiv: HTMLElement;
+	function updateGrid(w: number, h: number) {
+		grid.updateGrid(config.rows, config.columns, config.gap, w, h);
 	}
 
 	onMount(() => {
-		updateGrid();
-		let destroy = on(window, 'resize', updateGrid);
+		updateGrid(containerDiv.offsetWidth, containerDiv.offsetHeight);
+		let destroy = on(window, 'resize', () => {
+			updateGrid(containerDiv.offsetWidth, containerDiv.offsetHeight);
+		});
 		return () => destroy();
 	});
 </script>
 
 {#if grid.show}
 	<div
+		bind:this={containerDiv}
 		transition:fade={{ duration: config.transitionDuration }}
 		class="grid-container"
 		style="
 		--gap: {config.gap}px; 
 		grid-template-columns: repeat({config.columns}, 1fr);
-	"   
+	"
 	>
 		{#each cells as cell}
 			<div

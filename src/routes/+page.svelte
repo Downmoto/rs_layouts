@@ -32,9 +32,13 @@
 </script>
 
 <main>
-	<button onclick={() => windowManager.createWindow()} style:position="absolute"> click me </button>
-	<RsLayout {windowConfig} />
-	<Grid config={gridConfig} />
+	<div class="container">
+		<button onclick={() => windowManager.createWindow()} style:position="absolute">
+			click me
+		</button>
+		<Grid config={gridConfig} />
+		<RsLayout {windowConfig} />
+	</div>
 </main>
 
 <style>
@@ -45,5 +49,10 @@
 	:global(body) {
 		margin: 0;
 		overflow: hidden;
+	}
+
+	.container {
+		height: 100%;
+		width: 100%;
 	}
 </style>

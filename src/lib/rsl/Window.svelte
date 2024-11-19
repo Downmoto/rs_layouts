@@ -9,18 +9,23 @@
 		win = $bindable(),
 		windowConfig,
 		onRemove,
-		onClick
+		onClick,
+		parentWidthConstraint,
+		parentHeightConstraint
 	}: {
 		win: WindowData;
 		windowConfig: WindowConfig;
 		onRemove: Function;
 		onClick: Function;
+		parentWidthConstraint: number;
+		parentHeightConstraint: number;
 	} = $props();
 
 	let moving = $state(false);
 	let resizing = $state(false);
 	let grid = getVirtualGridState();
 	let cells: Cell[] = $derived(grid.getCells());
+	let containerDiv: HTMLElement | undefined = $state()
 
 	let startX = 0;
 	let startY = 0;
@@ -139,9 +144,9 @@
 			if (moving) {
 				win.botRight.x = width;
 			}
-		} else if (win.botRight.x > window.innerWidth) {
-			win.botRight.x = window.innerWidth;
-			win.topLeft.x = window.innerWidth - width;
+		} else if (win.botRight.x > parentWidthConstraint) {
+			win.botRight.x = parentWidthConstraint;
+			win.topLeft.x = parentWidthConstraint - width;
 		}
 
 		if (win.topLeft.y < 0) {
@@ -149,9 +154,9 @@
 			if (moving) {
 				win.botRight.y = height;
 			}
-		} else if (win.botRight.y > window.innerHeight) {
-			win.botRight.y = window.innerHeight;
-			win.topLeft.y = window.innerHeight - height;
+		} else if (win.botRight.y > parentHeightConstraint) {
+			win.botRight.y = parentHeightConstraint;
+			win.topLeft.y = parentHeightConstraint - height;
 		}
 		moving = false;
 		resizing = false;

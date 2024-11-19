@@ -1,36 +1,37 @@
 <script lang="ts">
-	import type { GridConfig } from './helpers/config/girdConfig.js';
-	import type { WindowManagerConfig } from './helpers/config/windowManagerConfig.js';
 	import type { WindowConfig } from './helpers/config/windowConfig.js';
 	import type { WindowData } from './helpers/types/WindowData.js';
-	import { setVirtualGridState } from './helpers/state/virtualGridState.svelte.js';
-	import {
-		getWindowManagerState,
-		setWindowManagerState
-	} from './helpers/state/windowManagerState.svelte.js';
-	import Grid from './Grid.svelte';
+	import { getWindowManagerState } from './helpers/state/windowManagerState.svelte.js';
 	import Window from './Window.svelte';
 
 	let {
-		windowConfig,
+		windowConfig
 	}: {
 		windowConfig: WindowConfig;
 	} = $props();
 
+	let containerDiv: HTMLElement | undefined = $state()
 	// Initial grid with no w & h made and passed to Grid for onMount re-initialization
 	let windowManager = getWindowManagerState();
 	let windows: WindowData[] = $derived(windowManager.getWindows());
 </script>
 
-<div class="rs">
-	<div class="window-manager">
-		{#each windows as w, index (w.id)}
-			<Window
-				{windowConfig}
-				bind:win={windows[index]}
-				onRemove={() => windowManager.removeWindow(w.id)}
-				onClick={() => windowManager.bringWindowToFront(w.id)}
-			/>
-		{/each}
-	</div>
+<div class="rs" bind:this={containerDiv}>
+	{#each windows as w, index (w.id)}
+		<Window
+			{windowConfig}
+			bind:win={windows[index]}
+			onRemove={() => windowManager.removeWindow(w.id)}
+			onClick={() => windowManager.bringWindowToFront(w.id)}
+			parentWidthConstraint={containerDiv.offsetWidth}
+			parentHeightConstraint={containerDiv.offsetHeight}
+		/>
+	{/each}
 </div>
+
+<style>
+	.rs {
+		width: 100%;
+		height: 100%;
+	}
+</style>
