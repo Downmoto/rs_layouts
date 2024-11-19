@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { WindowData } from './helpers/types/WindowData.js';
+    import type { Cell } from './helpers/types/Cell.js';
 	import type { WindowConfig } from './helpers/config/windowConfig.js';
 	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
 	import { getVirtualGridState } from './helpers/state/virtualGridState.svelte.js';
-	import type { Cell } from './helpers/types/Cell.js';
 
 	let {
 		win = $bindable(),
@@ -19,9 +19,8 @@
 
 	let moving = $state(false);
 	let resizing = $state(false);
-	let resizeDirection: string | null = null;
-	let grid = getVirtualGridState()
-	let cells: Cell[] = $derived(grid.getCells())
+	let grid = getVirtualGridState();
+	let cells: Cell[] = $derived(grid.getCells());
 
 	let startX = 0;
 	let startY = 0;
@@ -29,7 +28,17 @@
 	let initialBotRight = { x: 0, y: 0 };
 	let initialWidth = 0;
 	let initialHeight = 0;
-
+	let resizeDirection: string | null = null;
+	let positions: string[] = [
+		'bottom',
+		'bottom-right',
+		'bottom-left',
+		'left',
+		'right',
+		'top',
+		'top-right',
+		'top-left'
+	];
 
 	function onMouseDownHeader(e: MouseEvent) {
 		onClick(win.id);
@@ -57,69 +66,69 @@
 	}
 
 	function onMouseMove(e: MouseEvent) {
-	if (moving) {
-		const deltaX = e.clientX - startX;
-		const deltaY = e.clientY - startY;
-		// Update both topLeft and botRight to maintain size
-		win.topLeft.x = initialTopLeft.x + deltaX;
-		win.topLeft.y = initialTopLeft.y + deltaY;
-		win.botRight.x = win.topLeft.x + initialWidth;
-		win.botRight.y = win.topLeft.y + initialHeight;
-	}
-
-	if (resizing) {
-		const deltaX = e.clientX - startX;
-		const deltaY = e.clientY - startY;
-
-		// Adjust resizing based on direction
-		if (
-			resizeDirection === 'right' ||
-			resizeDirection === 'bottom-right' ||
-			resizeDirection === 'top-right'
-		) {
-			win.botRight.x = initialBotRight.x + deltaX;
+		if (moving) {
+			const deltaX = e.clientX - startX;
+			const deltaY = e.clientY - startY;
+			// Update both topLeft and botRight to maintain size
+			win.topLeft.x = initialTopLeft.x + deltaX;
+			win.topLeft.y = initialTopLeft.y + deltaY;
+			win.botRight.x = win.topLeft.x + initialWidth;
+			win.botRight.y = win.topLeft.y + initialHeight;
 		}
-		if (
-			resizeDirection === 'left' ||
-			resizeDirection === 'bottom-left' ||
-			resizeDirection === 'top-left'
-		) {
-			const newWidth = initialBotRight.x - (initialTopLeft.x + deltaX);
-			if (newWidth >= windowConfig.minWidth) {
-				win.topLeft.x = initialTopLeft.x + deltaX;
-			} else {
-				win.topLeft.x = initialBotRight.x - windowConfig.minWidth;
+
+		if (resizing) {
+			const deltaX = e.clientX - startX;
+			const deltaY = e.clientY - startY;
+
+			// Adjust resizing based on direction
+			if (
+				resizeDirection === 'right' ||
+				resizeDirection === 'bottom-right' ||
+				resizeDirection === 'top-right'
+			) {
+				win.botRight.x = initialBotRight.x + deltaX;
+			}
+			if (
+				resizeDirection === 'left' ||
+				resizeDirection === 'bottom-left' ||
+				resizeDirection === 'top-left'
+			) {
+				const newWidth = initialBotRight.x - (initialTopLeft.x + deltaX);
+				if (newWidth >= windowConfig.minWidth) {
+					win.topLeft.x = initialTopLeft.x + deltaX;
+				} else {
+					win.topLeft.x = initialBotRight.x - windowConfig.minWidth;
+				}
+			}
+			if (
+				resizeDirection === 'bottom' ||
+				resizeDirection === 'bottom-right' ||
+				resizeDirection === 'bottom-left'
+			) {
+				win.botRight.y = initialBotRight.y + deltaY;
+			}
+			if (
+				resizeDirection === 'top' ||
+				resizeDirection === 'top-right' ||
+				resizeDirection === 'top-left'
+			) {
+				const newHeight = initialBotRight.y - (initialTopLeft.y + deltaY);
+				if (newHeight >= windowConfig.minHeight) {
+					win.topLeft.y = initialTopLeft.y + deltaY;
+				} else {
+					win.topLeft.y = initialBotRight.y - windowConfig.minHeight;
+				}
+			}
+
+			// Enforce minimum size constraints
+			if (win.botRight.x - win.topLeft.x < windowConfig.minWidth) {
+				win.botRight.x = win.topLeft.x + windowConfig.minWidth;
+			}
+			if (win.botRight.y - win.topLeft.y < windowConfig.minHeight) {
+				win.botRight.y = win.topLeft.y + windowConfig.minHeight;
 			}
 		}
-		if (
-			resizeDirection === 'bottom' ||
-			resizeDirection === 'bottom-right' ||
-			resizeDirection === 'bottom-left'
-		) {
-			win.botRight.y = initialBotRight.y + deltaY;
-		}
-		if (
-			resizeDirection === 'top' ||
-			resizeDirection === 'top-right' ||
-			resizeDirection === 'top-left'
-		) {
-			const newHeight = initialBotRight.y - (initialTopLeft.y + deltaY);
-			if (newHeight >= windowConfig.minHeight) {
-				win.topLeft.y = initialTopLeft.y + deltaY;
-			} else {
-				win.topLeft.y = initialBotRight.y - windowConfig.minHeight;
-			}
-		}
-
-		// Enforce minimum size constraints
-		if (win.botRight.x - win.topLeft.x < windowConfig.minWidth) {
-			win.botRight.x = win.topLeft.x + windowConfig.minWidth;
-		}
-		if (win.botRight.y - win.topLeft.y < windowConfig.minHeight) {
-			win.botRight.y = win.topLeft.y + windowConfig.minHeight;
-		}
 	}
-}
 
 	function onMouseUp() {
 		const width = win.botRight.x - win.topLeft.x;
@@ -150,6 +159,8 @@
 	}
 </script>
 
+<svelte:window onmouseup={onMouseUp} onmousemove={onMouseMove} />
+
 <div
 	class="window {resizing || moving ? 'no-select' : ''}"
 	style="
@@ -179,71 +190,20 @@
 		<h1>hi</h1>
 	</div>
 	<!-- RESIZE HANDLES -->
-	<div
-		class="resize-handle right"
-		onmousedown={startResize('right')}
-		role="button"
-		aria-label="Resize right"
-		tabindex="0"
-	></div>
-
-	<div
-		class="resize-handle bottom"
-		onmousedown={startResize('bottom')}
-		role="button"
-		aria-label="Resize bottom"
-		tabindex="0"
-	></div>
-
-	<div
-		class="resize-handle bottom-right"
-		onmousedown={startResize('bottom-right')}
-		role="button"
-		aria-label="Resize bottom right corner"
-		tabindex="0"
-	></div>
-
-	<div
-		class="resize-handle left"
-		onmousedown={startResize('left')}
-		role="button"
-		aria-label="Resize left"
-		tabindex="0"
-	></div>
-
-	<div
-		class="resize-handle top"
-		onmousedown={startResize('top')}
-		role="button"
-		aria-label="Resize top"
-		tabindex="0"
-	></div>
-
-	<div
-		class="resize-handle top-right"
-		onmousedown={startResize('top-right')}
-		role="button"
-		aria-label="Resize top right corner"
-		tabindex="0"
-	></div>
-
-	<div
-		class="resize-handle top-left"
-		onmousedown={startResize('top-left')}
-		role="button"
-		aria-label="Resize top left corner"
-		tabindex="0"
-	></div>
-
-	<div
-		class="resize-handle bottom-left"
-		onmousedown={startResize('bottom-left')}
-		role="button"
-		aria-label="Resize bottom left corner"
-		tabindex="0"
-	></div>
+	{#each positions as position (position)}
+		{@render resizeBar(position)}
+	{/each}
 </div>
-<svelte:window onmouseup={onMouseUp} onmousemove={onMouseMove} />
+
+{#snippet resizeBar(position: string)}
+	<div
+		class="resize-handle {position}"
+		onmousedown={startResize(position)}
+		role="button"
+		aria-label="Resize {position}"
+		tabindex="0"
+	></div>
+{/snippet}
 
 <style>
 	.no-select {
