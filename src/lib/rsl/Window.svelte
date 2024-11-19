@@ -3,6 +3,7 @@
 	import type { WindowConfig } from './helpers/config/windowConfig.js';
 	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
 	import { getVirtualGridState } from './helpers/state/virtualGridState.svelte.js';
+	import type { Cell } from './helpers/types/Cell.js';
 
 	let {
 		win = $bindable(),
@@ -20,6 +21,7 @@
 	let resizing = $state(false);
 	let resizeDirection: string | null = null;
 	let grid = getVirtualGridState()
+	let cells: Cell[] = $derived(grid.getCells())
 
 	let startX = 0;
 	let startY = 0;
@@ -28,13 +30,6 @@
 	let initialWidth = 0;
 	let initialHeight = 0;
 
-	function handleOnRemove() {
-		onRemove(win.id);
-	}
-
-	function handleOnClick() {
-		onClick(win.id);
-	}
 
 	function onMouseDownHeader(e: MouseEvent) {
 		onClick(win.id);
@@ -62,58 +57,69 @@
 	}
 
 	function onMouseMove(e: MouseEvent) {
-		if (moving) {
-			const deltaX = e.clientX - startX;
-			const deltaY = e.clientY - startY;
-			// Update both topLeft and botRight to maintain size
-			win.topLeft.x = initialTopLeft.x + deltaX;
-			win.topLeft.y = initialTopLeft.y + deltaY;
-			win.botRight.x = win.topLeft.x + initialWidth;
-			win.botRight.y = win.topLeft.y + initialHeight;
+	if (moving) {
+		const deltaX = e.clientX - startX;
+		const deltaY = e.clientY - startY;
+		// Update both topLeft and botRight to maintain size
+		win.topLeft.x = initialTopLeft.x + deltaX;
+		win.topLeft.y = initialTopLeft.y + deltaY;
+		win.botRight.x = win.topLeft.x + initialWidth;
+		win.botRight.y = win.topLeft.y + initialHeight;
+	}
+
+	if (resizing) {
+		const deltaX = e.clientX - startX;
+		const deltaY = e.clientY - startY;
+
+		// Adjust resizing based on direction
+		if (
+			resizeDirection === 'right' ||
+			resizeDirection === 'bottom-right' ||
+			resizeDirection === 'top-right'
+		) {
+			win.botRight.x = initialBotRight.x + deltaX;
 		}
-		if (resizing) {
-			const deltaX = e.clientX - startX;
-			const deltaY = e.clientY - startY;
-
-			// Adjust resizing based on direction
-			if (
-				resizeDirection === 'right' ||
-				resizeDirection === 'bottom-right' ||
-				resizeDirection === 'top-right'
-			) {
-				win.botRight.x = initialBotRight.x + deltaX;
-			}
-			if (
-				resizeDirection === 'left' ||
-				resizeDirection === 'bottom-left' ||
-				resizeDirection === 'top-left'
-			) {
+		if (
+			resizeDirection === 'left' ||
+			resizeDirection === 'bottom-left' ||
+			resizeDirection === 'top-left'
+		) {
+			const newWidth = initialBotRight.x - (initialTopLeft.x + deltaX);
+			if (newWidth >= windowConfig.minWidth) {
 				win.topLeft.x = initialTopLeft.x + deltaX;
+			} else {
+				win.topLeft.x = initialBotRight.x - windowConfig.minWidth;
 			}
-			if (
-				resizeDirection === 'bottom' ||
-				resizeDirection === 'bottom-right' ||
-				resizeDirection === 'bottom-left'
-			) {
-				win.botRight.y = initialBotRight.y + deltaY;
-			}
-			if (
-				resizeDirection === 'top' ||
-				resizeDirection === 'top-right' ||
-				resizeDirection === 'top-left'
-			) {
+		}
+		if (
+			resizeDirection === 'bottom' ||
+			resizeDirection === 'bottom-right' ||
+			resizeDirection === 'bottom-left'
+		) {
+			win.botRight.y = initialBotRight.y + deltaY;
+		}
+		if (
+			resizeDirection === 'top' ||
+			resizeDirection === 'top-right' ||
+			resizeDirection === 'top-left'
+		) {
+			const newHeight = initialBotRight.y - (initialTopLeft.y + deltaY);
+			if (newHeight >= windowConfig.minHeight) {
 				win.topLeft.y = initialTopLeft.y + deltaY;
+			} else {
+				win.topLeft.y = initialBotRight.y - windowConfig.minHeight;
 			}
+		}
 
-			// Minimum size constraints
-			if (win.botRight.x - win.topLeft.x < windowConfig.minWidth) {
-				win.botRight.x = win.topLeft.x + windowConfig.minWidth;
-			}
-			if (win.botRight.y - win.topLeft.y < windowConfig.minHeight) {
-				win.botRight.y = win.topLeft.y + windowConfig.minHeight;
-			}
+		// Enforce minimum size constraints
+		if (win.botRight.x - win.topLeft.x < windowConfig.minWidth) {
+			win.botRight.x = win.topLeft.x + windowConfig.minWidth;
+		}
+		if (win.botRight.y - win.topLeft.y < windowConfig.minHeight) {
+			win.botRight.y = win.topLeft.y + windowConfig.minHeight;
 		}
 	}
+}
 
 	function onMouseUp() {
 		const width = win.botRight.x - win.topLeft.x;
@@ -155,7 +161,7 @@
 		
 		--resizeOverflow: {windowConfig.resizingZoneOverflow}px;
 		"
-	onmousedown={handleOnClick}
+	onmousedown={() => onClick(win.id)}
 	role="none"
 	tabindex="-1"
 >
@@ -163,7 +169,7 @@
 	<div class="window-header" onmousedown={onMouseDownHeader} role="none" tabindex="-1">
 		<div class="panes"></div>
 		<div class="window-controls">
-			<button class="close-btn" onclick={handleOnRemove}>
+			<button class="close-btn" onclick={() => onRemove(win.id)}>
 				<CloseSvg />
 			</button>
 		</div>

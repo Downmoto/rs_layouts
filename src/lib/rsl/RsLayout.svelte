@@ -19,9 +19,9 @@
 	} = $props();
 
 	// Initial grid with no w & h made and passed to Grid for onMount re-initialization
+	setVirtualGridState(gridConfig.rows, gridConfig.columns, gridConfig.gap);
 	let windowManager = setWindowManagerState(windowConfig, windowManagerConfig);
 	let windows: WindowData[] = $derived(windowManager.getWindows())
-	setVirtualGridState(gridConfig.rows, gridConfig.columns, gridConfig.gap);
 </script>
 
 <div class="rs">
