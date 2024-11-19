@@ -1,7 +1,6 @@
 import type { Cell } from '../types/Cell.js';
 import type { Point } from '../types/WindowData.js';
 import { getContext, setContext } from 'svelte';
-// TODO: right now it defaults to screen height, make it work if layout is nested
 export class VirtualGrid {
 	private cells: Cell[] = $state([]);
 	private rows!: number;
@@ -71,6 +70,40 @@ export class VirtualGrid {
 
 	public getCells(): Cell[] {
 		return this.cells;
+	}
+
+	public getNearestCell(point: Point): Cell | null {
+		let closestCell: Cell | null = null;
+		let minDistance = Infinity;
+
+		for (const cell of this.cells) {
+			const isWithinCell =
+				point.x >= cell.topLeft.x &&
+				point.x <= cell.botRight.x &&
+				point.y >= cell.topLeft.y &&
+				point.y <= cell.botRight.y;
+
+			if (isWithinCell) {
+				return cell; // Return immediately if the point is within this cell
+			}
+
+			// Calculate the distance to the center of the cell
+			const cellCenter: Point = {
+				x: (cell.topLeft.x + cell.botRight.x) / 2,
+				y: (cell.topLeft.y + cell.botRight.y) / 2,
+			};
+			const distance = Math.sqrt(
+				Math.pow(cellCenter.x - point.x, 2) + Math.pow(cellCenter.y - point.y, 2)
+			);
+
+			// Update the closest cell if this one is closer
+			if (distance < minDistance) {
+				minDistance = distance;
+				closestCell = cell;
+			}
+		}
+
+		return closestCell;
 	}
 }
 

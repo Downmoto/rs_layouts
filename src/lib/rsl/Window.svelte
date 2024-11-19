@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { WindowData } from './helpers/types/WindowData.js';
-    import type { Cell } from './helpers/types/Cell.js';
+	import type { Cell } from './helpers/types/Cell.js';
 	import type { WindowConfig } from './helpers/config/windowConfig.js';
 	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
 	import { getVirtualGridState } from './helpers/state/virtualGridState.svelte.js';
@@ -25,7 +25,6 @@
 	let resizing = $state(false);
 	let grid = getVirtualGridState();
 	let cells: Cell[] = $derived(grid.getCells());
-	let containerDiv: HTMLElement | undefined = $state()
 
 	let startX = 0;
 	let startY = 0;
@@ -139,25 +138,50 @@
 		const width = win.botRight.x - win.topLeft.x;
 		const height = win.botRight.y - win.topLeft.y;
 
+		// Constrain within parent boundaries
 		if (win.topLeft.x < 0) {
 			win.topLeft.x = 0;
-			if (moving) {
-				win.botRight.x = width;
-			}
+			win.botRight.x = width; // Maintain width
 		} else if (win.botRight.x > parentWidthConstraint) {
 			win.botRight.x = parentWidthConstraint;
-			win.topLeft.x = parentWidthConstraint - width;
+			win.topLeft.x = parentWidthConstraint - width; // Maintain width
 		}
 
 		if (win.topLeft.y < 0) {
 			win.topLeft.y = 0;
-			if (moving) {
-				win.botRight.y = height;
-			}
+			win.botRight.y = height; // Maintain height
 		} else if (win.botRight.y > parentHeightConstraint) {
 			win.botRight.y = parentHeightConstraint;
-			win.topLeft.y = parentHeightConstraint - height;
+			win.topLeft.y = parentHeightConstraint - height; // Maintain height
 		}
+
+		// Get the grid cells that the topLeft and botRight points are snapping to
+		const nearestTopLeftCell = grid.getNearestCell(win.topLeft);
+		const nearestBotRightCell = grid.getNearestCell(win.botRight);
+
+		if (nearestTopLeftCell && nearestBotRightCell) {
+			// Update the window dimensions to fully encompass the cells
+			const newTopLeft = nearestTopLeftCell.topLeft;
+			const newBotRight = nearestBotRightCell.botRight;
+
+			// Ensure minimum size constraints are met
+			if (moving) {
+			win.topLeft.x = newTopLeft.x;
+			win.topLeft.y = newTopLeft.y;
+
+			win.botRight.x = win.topLeft.x + width
+			win.botRight.y = win.topLeft.y + height
+			}
+
+			if (resizing) {
+			win.topLeft.x = newTopLeft.x;
+			win.topLeft.y = newTopLeft.y;
+            win.botRight.x = newBotRight.x;
+			win.botRight.y = newBotRight.y;
+
+			}
+		}
+
 		moving = false;
 		resizing = false;
 		grid.show = false;

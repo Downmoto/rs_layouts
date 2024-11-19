@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Grid from '$lib/rsl/Grid.svelte';
 	import type { GridConfig } from '$lib/rsl/helpers/config/girdConfig.js';
 	import type { WindowConfig } from '$lib/rsl/helpers/config/windowConfig.js';
 	import type { WindowManagerConfig } from '$lib/rsl/helpers/config/windowManagerConfig.js';
@@ -8,19 +7,20 @@
 		setWindowManagerState,
 		WindowManager
 	} from '$lib/rsl/helpers/state/windowManagerState.svelte.js';
+    import Grid from '$lib/rsl/Grid.svelte';
 	import RsLayout from '$lib/rsl/RsLayout.svelte';
 
 	let gridConfig: GridConfig = {
 		rows: 20,
 		columns: 20,
-		gap: 3,
+		gap: 1,
 		transitionDuration: 500
 	};
 
 	let windowConfig: WindowConfig = {
 		minWidth: 100,
 		minHeight: 100,
-		resizingZoneOverflow: 5
+		resizingZoneOverflow: 4
 	};
 
 	let windowManagerConfig: WindowManagerConfig = {
