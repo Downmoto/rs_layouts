@@ -1,35 +1,40 @@
 <script lang="ts">
+	import Grid from '$lib/rsl/Grid.svelte';
 	import type { GridConfig } from '$lib/rsl/helpers/config/girdConfig.js';
 	import type { WindowConfig } from '$lib/rsl/helpers/config/windowConfig.js';
 	import type { WindowManagerConfig } from '$lib/rsl/helpers/config/windowManagerConfig.js';
-	import { getWindowManagerState } from '$lib/rsl/helpers/state/windowManagerState.svelte.js';
+	import { setVirtualGridState } from '$lib/rsl/helpers/state/virtualGridState.svelte.js';
+	import {
+		setWindowManagerState,
+		WindowManager
+	} from '$lib/rsl/helpers/state/windowManagerState.svelte.js';
 	import RsLayout from '$lib/rsl/RsLayout.svelte';
 
 	let gridConfig: GridConfig = {
 		rows: 20,
 		columns: 20,
 		gap: 3,
-		transitionDuration: 500,
-
+		transitionDuration: 500
 	};
 
 	let windowConfig: WindowConfig = {
 		minWidth: 100,
 		minHeight: 100,
 		resizingZoneOverflow: 5
-	}
+	};
 
 	let windowManagerConfig: WindowManagerConfig = {
-		windowSpawnPoint: {x: 100, y: 200}
-	}
+		windowSpawnPoint: { x: 100, y: 200 }
+	};
 
-
-	let windowManager = getWindowManagerState()
+	setVirtualGridState(gridConfig.rows, gridConfig.columns, gridConfig.gap);
+	let windowManager: WindowManager = setWindowManagerState(windowConfig, windowManagerConfig);
 </script>
 
 <main>
 	<button onclick={() => windowManager.createWindow()} style:position="absolute"> click me </button>
-	<RsLayout {gridConfig} {windowConfig} {windowManagerConfig}/>
+	<RsLayout {windowConfig} />
+	<Grid config={gridConfig} />
 </main>
 
 <style>
