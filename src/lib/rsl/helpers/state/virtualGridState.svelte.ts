@@ -5,11 +5,11 @@ export class VirtualGrid {
 	private cells: Cell[] = $state([]);
 	private rows!: number;
 	private columns!: number;
-	private gap!: number;
 	private cellWidth!: number;
 	private cellHeight!: number;
-	
-    public show:boolean = $state(true);
+	public gap!: number;
+
+	public show: boolean = $state(true);
 
 	constructor(
 		rows: number,
@@ -41,7 +41,7 @@ export class VirtualGrid {
 					x: topLeft.x + this.cellWidth,
 					y: topLeft.y + this.cellHeight
 				};
-				this.cells.push({ topLeft, botRight });
+				this.cells.push({ topLeft, botRight, width: this.cellWidth, height: this.cellHeight });
 			}
 		}
 	}
@@ -58,7 +58,7 @@ export class VirtualGrid {
 		this.gap = gap;
 
 		if (screenHeight !== undefined && screenWidth !== undefined) {
-			this.cells = []
+			this.cells = [];
 			// Calculate cell dimensions based on screen size, gaps, and grid dimensions
 			this.cellWidth = (screenWidth - (columns - 1) * gap) / columns;
 			this.cellHeight = (screenHeight - (rows - 1) * gap) / rows;
@@ -90,7 +90,7 @@ export class VirtualGrid {
 			// Calculate the distance to the center of the cell
 			const cellCenter: Point = {
 				x: (cell.topLeft.x + cell.botRight.x) / 2,
-				y: (cell.topLeft.y + cell.botRight.y) / 2,
+				y: (cell.topLeft.y + cell.botRight.y) / 2
 			};
 			const distance = Math.sqrt(
 				Math.pow(cellCenter.x - point.x, 2) + Math.pow(cellCenter.y - point.y, 2)

@@ -20,7 +20,9 @@
 	let windowConfig: WindowConfig = {
 		minWidth: 100,
 		minHeight: 100,
-		resizingZoneOverflow: 4
+		resizingZoneOverflow: 4,
+		snapOnByDefault: true,
+		snapThreshold: 50
 	};
 
 	let windowManagerConfig: WindowManagerConfig = {
