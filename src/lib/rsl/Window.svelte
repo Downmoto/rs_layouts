@@ -23,7 +23,6 @@
 	} = $props();
 
 	let snapping = $state(windowConfig.snapOnByDefault);
-	let snapped = $state(windowConfig.snapOnByDefault);
 	let moving = $state(false);
 	let resizing = $state(false);
 	let grid = getVirtualGridState();
@@ -88,8 +87,8 @@
 			const deltaY = e.clientY - startY;
 
 			// Get grid cell dimensions for snapping
-			const cellWidth: number = snapped ? cells[0].width + grid.gap : 1;
-			const cellHeight: number = snapped ? cells[0].height + grid.gap : 1;
+			const cellWidth: number = snapping ? cells[0].width + grid.gap : 1;
+			const cellHeight: number = snapping ? cells[0].height + grid.gap : 1;
 
 			// Adjust resizing based on direction
 			if (
@@ -97,7 +96,7 @@
 				resizeDirection === 'bottom-right' ||
 				resizeDirection === 'top-right'
 			) {
-				win.botRight.x = snapped
+				win.botRight.x = snapping
 					? initialBotRight.x + Math.round(deltaX / cellWidth) * cellWidth
 					: initialBotRight.x + deltaX;
 			}
@@ -106,12 +105,12 @@
 				resizeDirection === 'bottom-left' ||
 				resizeDirection === 'top-left'
 			) {
-				const newWidth = snapped
+				const newWidth = snapping
 					? Math.round((initialBotRight.x - (initialTopLeft.x + deltaX)) / cellWidth) * cellWidth
 					: initialBotRight.x - (initialTopLeft.x + deltaX);
 
 				if (newWidth >= windowConfig.minWidth) {
-					win.topLeft.x = snapped ? initialBotRight.x - newWidth : initialTopLeft.x + deltaX;
+					win.topLeft.x = snapping ? initialBotRight.x - newWidth : initialTopLeft.x + deltaX;
 				} else {
 					win.topLeft.x = initialBotRight.x - windowConfig.minWidth;
 				}
@@ -121,7 +120,7 @@
 				resizeDirection === 'bottom-right' ||
 				resizeDirection === 'bottom-left'
 			) {
-				win.botRight.y = snapped
+				win.botRight.y = snapping
 					? initialBotRight.y + Math.round(deltaY / cellHeight) * cellHeight
 					: initialBotRight.y + deltaY;
 			}
@@ -130,12 +129,12 @@
 				resizeDirection === 'top-right' ||
 				resizeDirection === 'top-left'
 			) {
-				const newHeight = snapped
+				const newHeight = snapping
 					? Math.round((initialBotRight.y - (initialTopLeft.y + deltaY)) / cellHeight) * cellHeight
 					: initialBotRight.y - (initialTopLeft.y + deltaY);
 
 				if (newHeight >= windowConfig.minHeight) {
-					win.topLeft.y = snapped ? initialBotRight.y - newHeight : initialTopLeft.y + deltaY;
+					win.topLeft.y = snapping ? initialBotRight.y - newHeight : initialTopLeft.y + deltaY;
 				} else {
 					win.topLeft.y = initialBotRight.y - windowConfig.minHeight;
 				}
@@ -172,36 +171,69 @@
 			win.topLeft.y = parentHeightConstraint - height; // Maintain height
 		}
 
-		// TODO: Fix snapping jittery ness, maybe add snap threshold
+		// TODO: 
 		// Get the grid cells that the topLeft and botRight points are snapping to
 		if (snapping) {
 			let nearestTopLeftCell = grid.getNearestCell(win.topLeft);
 
 			if (nearestTopLeftCell) {
-				// Update the window dimensions to fully encompass the cells
-				const newTopLeft = nearestTopLeftCell.topLeft;
-
-				// Ensure minimum size constraints are met
 				if (moving) {
-					const coverage = calculateCoveragePercentage(nearestTopLeftCell, win);
+					const newTopLeft = nearestTopLeftCell.topLeft;
+					const coverage = calculateCoveragePercentage(
+						nearestTopLeftCell,
+						win,
+						windowConfig.snapThreshold
+					);
+					console.log(coverage);
 
-					if (coverage >= windowConfig.snapThreshold) {
-						win.topLeft.x = newTopLeft.x;
-						win.topLeft.y = newTopLeft.y;
-
+					function correctBotRight() {
 						win.botRight.x = win.topLeft.x + width;
 						win.botRight.y = win.topLeft.y + height;
 
 						let nearestBotRightCell = grid.getNearestCell(win.botRight);
 						if (nearestBotRightCell) {
-							win.botRight.x = nearestBotRightCell.botRight.x
-							win.botRight.y = nearestBotRightCell.botRight.y
+							win.botRight.x = nearestBotRightCell.botRight.x;
+							win.botRight.y = nearestBotRightCell.botRight.y;
 						}
-
-						snapped = true
 					}
-					else {
-						snapped = false
+
+					if (coverage.topLeft) {
+						win.topLeft.x = newTopLeft.x;
+						win.topLeft.y = newTopLeft.y;
+
+						correctBotRight();
+					} else if (coverage.topRight) {
+						const rightNeighbour = grid.getRightNeighbour(nearestTopLeftCell);
+
+						if (rightNeighbour) {
+							win.topLeft.x = rightNeighbour.topLeft.x;
+							win.topLeft.y = rightNeighbour.topLeft.y;
+
+							correctBotRight();
+						}
+					} else if (coverage.botLeft) {
+						const bottomNeighbour = grid.getBottomNeighbour(nearestTopLeftCell);
+
+						if (bottomNeighbour) {
+							win.topLeft.x = bottomNeighbour.topLeft.x;
+							win.topLeft.y = bottomNeighbour.topLeft.y;
+
+							correctBotRight();
+						}
+					} else if (coverage.botRight) {
+						const botRightNeighbour = grid.getBottomRightNeighbour(nearestTopLeftCell);
+
+						if (botRightNeighbour) {
+							win.topLeft.x = botRightNeighbour.topLeft.x;
+							win.topLeft.y = botRightNeighbour.topLeft.y;
+
+							correctBotRight();
+						}
+					} else {
+						win.topLeft.x = newTopLeft.x;
+						win.topLeft.y = newTopLeft.y;
+
+						correctBotRight();
 					}
 				}
 			}

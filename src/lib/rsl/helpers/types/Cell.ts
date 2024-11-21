@@ -5,4 +5,6 @@ export type Cell = {
 	botRight: Point;
 	width: number;
 	height: number;
+	row: number;
+	col: number;
 };

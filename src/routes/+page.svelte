@@ -11,8 +11,8 @@
 	import RsLayout from '$lib/rsl/RsLayout.svelte';
 
 	let gridConfig: GridConfig = {
-		rows: 20,
-		columns: 20,
+		rows: 100,
+		columns: 100,
 		gap: 1,
 		transitionDuration: 500
 	};
@@ -22,7 +22,7 @@
 		minHeight: 100,
 		resizingZoneOverflow: 4,
 		snapOnByDefault: true,
-		snapThreshold: 50
+		snapThreshold: 30
 	};
 
 	let windowManagerConfig: WindowManagerConfig = {
