@@ -4,7 +4,6 @@
 	import type { WindowConfig } from './helpers/config/windowConfig.js';
 	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
 	import { getVirtualGridState } from './helpers/state/virtualGridState.svelte.js';
-	import { calculateCoveragePercentage } from './helpers/math.js';
 
 	let {
 		win = $bindable(),
@@ -72,12 +71,14 @@
 	}
 
 	function onMouseMove(e: MouseEvent) {
+		const cellWidth: number = snapping ? cells[0].width + grid.gap : 1;
+		const cellHeight: number = snapping ? cells[0].height + grid.gap : 1;
 		if (moving) {
 			const deltaX = e.clientX - startX;
 			const deltaY = e.clientY - startY;
 			// Update both topLeft and botRight to maintain size
-			win.topLeft.x = initialTopLeft.x + deltaX;
-			win.topLeft.y = initialTopLeft.y + deltaY;
+			win.topLeft.x = initialTopLeft.x + Math.round(deltaX / cellWidth) * cellWidth;
+			win.topLeft.y = initialTopLeft.y + Math.round(deltaY / cellHeight) * cellHeight;
 			win.botRight.x = win.topLeft.x + initialWidth;
 			win.botRight.y = win.topLeft.y + initialHeight;
 		}
@@ -87,8 +88,6 @@
 			const deltaY = e.clientY - startY;
 
 			// Get grid cell dimensions for snapping
-			const cellWidth: number = snapping ? cells[0].width + grid.gap : 1;
-			const cellHeight: number = snapping ? cells[0].height + grid.gap : 1;
 
 			// Adjust resizing based on direction
 			if (
@@ -171,70 +170,23 @@
 			win.topLeft.y = parentHeightConstraint - height; // Maintain height
 		}
 
-		// TODO: 
+		// TODO:
 		// Get the grid cells that the topLeft and botRight points are snapping to
 		if (snapping) {
 			let nearestTopLeftCell = grid.getNearestCell(win.topLeft);
-
 			if (nearestTopLeftCell) {
-				if (moving) {
-					const newTopLeft = nearestTopLeftCell.topLeft;
-					const coverage = calculateCoveragePercentage(
-						nearestTopLeftCell,
-						win,
-						windowConfig.snapThreshold
-					);
-					console.log(coverage);
+				const newTopLeft = nearestTopLeftCell.topLeft;
 
-					function correctBotRight() {
-						win.botRight.x = win.topLeft.x + width;
-						win.botRight.y = win.topLeft.y + height;
+				win.topLeft.x = newTopLeft.x;
+				win.topLeft.y = newTopLeft.y;
 
-						let nearestBotRightCell = grid.getNearestCell(win.botRight);
-						if (nearestBotRightCell) {
-							win.botRight.x = nearestBotRightCell.botRight.x;
-							win.botRight.y = nearestBotRightCell.botRight.y;
-						}
-					}
+				win.botRight.x = win.topLeft.x + width;
+				win.botRight.y = win.topLeft.y + height;
 
-					if (coverage.topLeft) {
-						win.topLeft.x = newTopLeft.x;
-						win.topLeft.y = newTopLeft.y;
-
-						correctBotRight();
-					} else if (coverage.topRight) {
-						const rightNeighbour = grid.getRightNeighbour(nearestTopLeftCell);
-
-						if (rightNeighbour) {
-							win.topLeft.x = rightNeighbour.topLeft.x;
-							win.topLeft.y = rightNeighbour.topLeft.y;
-
-							correctBotRight();
-						}
-					} else if (coverage.botLeft) {
-						const bottomNeighbour = grid.getBottomNeighbour(nearestTopLeftCell);
-
-						if (bottomNeighbour) {
-							win.topLeft.x = bottomNeighbour.topLeft.x;
-							win.topLeft.y = bottomNeighbour.topLeft.y;
-
-							correctBotRight();
-						}
-					} else if (coverage.botRight) {
-						const botRightNeighbour = grid.getBottomRightNeighbour(nearestTopLeftCell);
-
-						if (botRightNeighbour) {
-							win.topLeft.x = botRightNeighbour.topLeft.x;
-							win.topLeft.y = botRightNeighbour.topLeft.y;
-
-							correctBotRight();
-						}
-					} else {
-						win.topLeft.x = newTopLeft.x;
-						win.topLeft.y = newTopLeft.y;
-
-						correctBotRight();
-					}
+				let nearestBotRightCell = grid.getNearestCell(win.botRight);
+				if (nearestBotRightCell) {
+					win.botRight.x = nearestBotRightCell.botRight.x;
+					win.botRight.y = nearestBotRightCell.botRight.y;
 				}
 			}
 		}

@@ -11,8 +11,8 @@
 	import RsLayout from '$lib/rsl/RsLayout.svelte';
 
 	let gridConfig: GridConfig = {
-		rows: 100,
-		columns: 100,
+		rows: 30,
+		columns: 30,
 		gap: 1,
 		transitionDuration: 500
 	};
@@ -26,7 +26,7 @@
 	};
 
 	let windowManagerConfig: WindowManagerConfig = {
-		windowSpawnPoint: { x: 100, y: 200 }
+		windowSpawnPoint: { x: 0, y: 0 }
 	};
 
 	setVirtualGridState(gridConfig.rows, gridConfig.columns, gridConfig.gap);
