@@ -1,6 +1,6 @@
 import type { WindowConfig } from '../config/windowConfig.js';
 import type { WindowManagerConfig } from '../config/windowManagerConfig.js';
-import type { WindowData } from '../types/WindowData.js';
+import type { WindowData } from '../config/types/WindowData.js';
 import { getContext, setContext } from 'svelte';
 
 export class WindowManager {

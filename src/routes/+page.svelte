@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { WindowConfig } from '$lib/rsl/helpers/config/windowConfig.js';
-	import type { WindowManagerConfig } from '$lib/rsl/helpers/config/windowManagerConfig.js';
-	import { setWindowManagerState } from '$lib/rsl/helpers/state/windowManagerState.svelte.js';
+	import type { WindowConfig } from '$lib/rsl/config/windowConfig.js';
+	import type { WindowManagerConfig } from '$lib/rsl/config/windowManagerConfig.js';
+	import { setWindowManagerState } from '$lib/rsl/state/windowManagerState.svelte.js';
 	import RsLayout from '$lib/rsl/RsLayout.svelte';
 
 	let windowConfig: WindowConfig = {

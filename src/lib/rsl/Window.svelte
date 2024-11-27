@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { WindowData } from './helpers/types/WindowData.js';
-	import type { Cell } from './helpers/types/Cell.js';
-	import type { WindowConfig } from './helpers/config/windowConfig.js';
-	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
+	import type { WindowData } from './config/types/WindowData.js';
+	import type { Cell } from './config/types/Cell.js';
+	import type { WindowConfig } from './config/windowConfig.js';
+	import CloseSvg from './svgs/CloseSVG.svelte';
 
 	let {
 		win = $bindable(),
