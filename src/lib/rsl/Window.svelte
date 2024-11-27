@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { WindowData } from './config/types/WindowData.js';
-	import type { Cell } from './config/types/Cell.js';
-	import type { WindowConfig } from './config/windowConfig.js';
+	import type { WindowData } from './types/WindowData.js';
+	import type { Cell } from './types/Cell.js';
+	import type { WindowConfig } from './configs/windowConfig.js';
 	import CloseSvg from './svgs/CloseSVG.svelte';
 
 	let {

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { WindowConfig } from './config/windowConfig.js';
-	import type { WindowData } from './config/types/WindowData.js';
-	import { getWindowManagerState } from './state/windowManagerState.svelte.js';
+	import type { WindowConfig } from './configs/windowConfig.js';
+	import type { WindowData } from './types/WindowData.js';
+	import { getWindowManagerState } from './states/windowManagerState.svelte.js';
 	import Window from './Window.svelte';
 
 	let {
