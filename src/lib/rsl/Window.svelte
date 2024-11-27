@@ -211,7 +211,7 @@
 	}
 
 	.window {
-		background-color: lightgrey;
+		background-color: #EFEFEF;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 		position: absolute;
 		min-height: 100px;
@@ -219,7 +219,7 @@
 	}
 
 	.window-header {
-		background-color: rgb(250, 0, 42);
+		background-color: #D0D6B3;
 		height: 30px;
 		user-select: none;
 	}
