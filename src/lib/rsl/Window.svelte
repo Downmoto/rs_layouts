@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { WindowData } from './types/WindowData.js';
-	import type { Cell } from './types/Cell.js';
 	import type { WindowConfig } from './configs/windowConfig.js';
+	import type { Snippet } from 'svelte';
 	import CloseSvg from './svgs/CloseSVG.svelte';
 
 	let {
@@ -10,7 +10,8 @@
 		onRemove,
 		onClick,
 		parentWidthConstraint,
-		parentHeightConstraint
+		parentHeightConstraint,
+		emptyWindowContent
 	}: {
 		win: WindowData;
 		windowConfig: WindowConfig;
@@ -18,10 +19,13 @@
 		onClick: Function;
 		parentWidthConstraint: number;
 		parentHeightConstraint: number;
+		emptyWindowContent?: Snippet;
 	} = $props();
 
 	let moving = $state(false);
 	let resizing = $state(false);
+
+	let contentRef: HTMLDivElement;
 
 	let startX = 0;
 	let startY = 0;
@@ -32,13 +36,13 @@
 	let resizeDirection: string | null = null;
 	let positions: string[] = [
 		'bottom',
-		'bottom-right',
-		'bottom-left',
 		'left',
 		'right',
 		'top',
 		'top-right',
-		'top-left'
+		'top-left',
+		'bottom-right',
+		'bottom-left'
 	];
 
 	function onMouseDownHeader(e: MouseEvent) {
@@ -76,10 +80,11 @@
 		}
 
 		if (resizing) {
+			const contentWidth = contentRef ? contentRef.offsetWidth : 0;
+			const contentHeight = contentRef ? contentRef.offsetHeight : 0;
+
 			const deltaX = e.clientX - startX;
 			const deltaY = e.clientY - startY;
-
-			// Get grid cell dimensions for snapping
 
 			// Adjust resizing based on direction
 			if (
@@ -87,7 +92,10 @@
 				resizeDirection === 'bottom-right' ||
 				resizeDirection === 'top-right'
 			) {
-				win.botRight.x = initialBotRight.x + deltaX;
+				win.botRight.x = Math.max(
+					initialBotRight.x + deltaX,
+					win.topLeft.x + Math.max(windowConfig.minWidth, contentWidth)
+				);
 			}
 			if (
 				resizeDirection === 'left' ||
@@ -95,19 +103,23 @@
 				resizeDirection === 'top-left'
 			) {
 				const newWidth = initialBotRight.x - (initialTopLeft.x + deltaX);
-
-				if (newWidth >= windowConfig.minWidth) {
+				if (newWidth >= Math.max(windowConfig.minWidth, contentWidth)) {
 					win.topLeft.x = initialTopLeft.x + deltaX;
 				} else {
-					win.topLeft.x = initialBotRight.x - windowConfig.minWidth;
+					// Ensure `botRight.x` remains consistent
+					win.topLeft.x = win.botRight.x - Math.max(windowConfig.minWidth, contentWidth);
 				}
 			}
+
 			if (
 				resizeDirection === 'bottom' ||
 				resizeDirection === 'bottom-right' ||
 				resizeDirection === 'bottom-left'
 			) {
-				win.botRight.y = initialBotRight.y + deltaY;
+				win.botRight.y = Math.max(
+					initialBotRight.y + deltaY,
+					win.topLeft.y + Math.max(windowConfig.minHeight, contentHeight)
+				);
 			}
 			if (
 				resizeDirection === 'top' ||
@@ -115,20 +127,12 @@
 				resizeDirection === 'top-left'
 			) {
 				const newHeight = initialBotRight.y - (initialTopLeft.y + deltaY);
-
-				if (newHeight >= windowConfig.minHeight) {
+				if (newHeight >= Math.max(windowConfig.minHeight, contentHeight)) {
 					win.topLeft.y = initialTopLeft.y + deltaY;
 				} else {
-					win.topLeft.y = initialBotRight.y - windowConfig.minHeight;
+					// Ensure `botRight.y` remains consistent
+					win.topLeft.y = win.botRight.y - Math.max(windowConfig.minHeight, contentHeight);
 				}
-			}
-
-			// Enforce minimum size constraints
-			if (win.botRight.x - win.topLeft.x < windowConfig.minWidth) {
-				win.botRight.x = win.topLeft.x + windowConfig.minWidth;
-			}
-			if (win.botRight.y - win.topLeft.y < windowConfig.minHeight) {
-				win.botRight.y = win.topLeft.y + windowConfig.minHeight;
 			}
 		}
 	}
@@ -178,7 +182,11 @@
 >
 	<!-- HEADER -->
 	<div class="window-header" onmousedown={onMouseDownHeader} role="none" tabindex="-1">
-		<div class="panes"></div>
+		<div class="panes">
+			{#each win.panes as pane}
+				<div class="pane">{pane.title}</div>
+			{/each}
+		</div>
 		<div class="window-controls">
 			<button class="close-btn" onclick={() => onRemove(win.id)}>
 				<CloseSvg />
@@ -186,8 +194,16 @@
 		</div>
 	</div>
 	<!-- CONTENT -->
-	<div class="window-content">
-		<h1>hi</h1>
+	<div class="window-content" bind:this={contentRef}>
+		{#if win.panes.length == 0}
+			{#if emptyWindowContent}
+				{@render emptyWindowContent()}
+			{:else}
+				<h1>No panes</h1>
+			{/if}
+		{:else}
+			<h1>{win.panes.length}</h1>
+		{/if}
 	</div>
 	<!-- RESIZE HANDLES -->
 	{#each positions as position (position)}
@@ -211,16 +227,17 @@
 	}
 
 	.window {
-		background-color: #EFEFEF;
+		background-color: #efefef;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 		position: absolute;
 		min-height: 100px;
 		min-width: 100px;
+		overflow: hidden;
 	}
 
 	.window-header {
-		background-color: #D0D6B3;
-		height: 30px;
+		background-color: #d0d6b3;
+		height: 50px;
 		user-select: none;
 	}
 
@@ -228,6 +245,14 @@
 		right: 0;
 		position: absolute;
 		padding-right: 2px;
+	}
+
+	.window-content {
+		display: flex; /* Ensure content flows properly */
+		flex-direction: column; /* Adjust content direction */
+		inline-size: fit-content; /* Let the content dictate the size */
+		block-size: fit-content; /* Ensure height is determined by the content */
+		overflow: hidden; /* Prevent overflow from affecting the layout */
 	}
 
 	.close-btn {

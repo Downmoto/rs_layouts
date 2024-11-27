@@ -1,7 +1,7 @@
 import type { WindowConfig } from '../configs/windowConfig.js';
 import type { WindowManagerConfig } from '../configs/windowManagerConfig.js';
 import type { WindowData } from '../types/WindowData.js';
-import { getContext, setContext } from 'svelte';
+import { getContext, setContext, type Snippet } from 'svelte';
 
 export class WindowManager {
 	private windows: WindowData[] = $state([]);
@@ -15,7 +15,7 @@ export class WindowManager {
 		this.windowManagerConfig = windowManagerConfig;
 	}
 
-	public createWindow() {
+	public createWindow(panes?: {title: string, content:Snippet}[]) {
 		const topLeft = this.windowManagerConfig.windowSpawnPoint;
 		const botRight = {
 			x: this.windowConfig.minWidth + this.windowManagerConfig.windowSpawnPoint.x,
@@ -24,7 +24,7 @@ export class WindowManager {
 
 		this.windows.push({
 			id: crypto.randomUUID(),
-			panes: [],
+			panes: panes || [],
 			topLeft,
 			botRight,
 			zIndex: ++this.maxZIndex

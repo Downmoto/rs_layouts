@@ -10,7 +10,7 @@
 		windowConfig: WindowConfig;
 	} = $props();
 
-	let containerDiv: HTMLElement | undefined = $state()
+	let containerDiv: HTMLElement | undefined = $state();
 	// Initial grid with no w & h made and passed to Grid for onMount re-initialization
 	let windowManager = getWindowManagerState();
 	let windows: WindowData[] = $derived(windowManager.getWindows());

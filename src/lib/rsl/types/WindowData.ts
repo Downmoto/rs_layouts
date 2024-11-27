@@ -1,12 +1,11 @@
-import type { Cell } from "./Cell.js";
+import type { Snippet } from 'svelte';
 
 export type WindowData = {
 	id: string;
-	panes: string[];
+	panes: {title: string, content: Snippet}[];
 	topLeft: Point;
 	botRight: Point;
 	zIndex: number;
-	cells?: [Cell, Cell]
 };
 
 export type Point = {

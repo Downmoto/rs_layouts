@@ -1,5 +1,5 @@
-import type { Point } from "../types/WindowData.js";
+import type { Point } from '../types/WindowData.js';
 
 export interface WindowManagerConfig {
-    windowSpawnPoint: Point
+	windowSpawnPoint: Point;
 }
