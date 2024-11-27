@@ -193,7 +193,7 @@
 
 		moving = false;
 		resizing = false;
-		grid.show = false;
+		// grid.show = false;
 	}
 </script>
 

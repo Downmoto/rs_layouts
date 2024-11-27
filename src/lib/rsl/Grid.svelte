@@ -4,7 +4,6 @@
 	import { getVirtualGridState, VirtualGrid } from './helpers/state/virtualGridState.svelte.js';
 	import { onMount } from 'svelte';
 	import { on } from 'svelte/events';
-	import { fade } from 'svelte/transition';
 
 	let { config }: { config: GridConfig } = $props();
 
@@ -24,18 +23,21 @@
 		});
 		return () => destroy();
 	});
+
+	$effect(() => {
+		console.log($state.snapshot(cells))
+	})
 </script>
 
-{#if grid.show}
-	<div
-		bind:this={containerDiv}
-		transition:fade={{ duration: config.transitionDuration }}
-		class="grid-container"
-		style="
+<div
+	bind:this={containerDiv}
+	class="grid-container"
+	style="
 		--gap: {config.gap}px; 
 		grid-template-columns: repeat({config.columns}, 1fr);
 	"
-	>
+>
+	{#if grid.show}
 		{#each cells as cell}
 			<div
 				class="cell"
@@ -45,8 +47,8 @@
 			"
 			></div>
 		{/each}
-	</div>
-{/if}
+	{/if}
+</div>
 
 <style>
 	.grid-container {
@@ -60,6 +62,7 @@
 	}
 
 	.cell {
+		border-radius: 5px;
 		background-color: lightgray;
 		border: 1px solid #ccc;
 		box-sizing: border-box;

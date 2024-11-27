@@ -106,35 +106,6 @@ export class VirtualGrid {
 		return closestCell;
 	}
 
-	// Get the right neighbour of a given cell
-	public getRightNeighbour(cell: Cell): Cell | null {
-		const rightColumn = cell.col + 1;
-		if (rightColumn < this.columns) {
-			return this.cells.find(c => c.row === cell.row && c.col === rightColumn) || null;
-		}
-		return null; // No neighbour
-	}
-
-	// Get the bottom neighbour of a given cell
-	public getBottomNeighbour(cell: Cell): Cell | null {
-		const bottomRow = cell.row + 1;
-		if (bottomRow < this.rows) {
-			return this.cells.find(c => c.row === bottomRow && c.col === cell.col) || null;
-		}
-		return null; // No neighbour
-	}
-
-	// Get the bottom-right neighbour of a given cell
-	public getBottomRightNeighbour(cell: Cell): Cell | null {
-		const rightColumn = cell.col + 1;
-		const bottomRow = cell.row + 1;
-		if (rightColumn < this.columns && bottomRow < this.rows) {
-			return this.cells.find(
-				c => c.row === bottomRow && c.col === rightColumn
-			) || null;
-		}
-		return null; // No neighbour
-	}
 }
 
 const VIRTUAL_GRID_KEY = Symbol('virtualGrid');
