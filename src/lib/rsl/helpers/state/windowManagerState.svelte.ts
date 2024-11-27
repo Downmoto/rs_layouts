@@ -2,7 +2,6 @@ import type { WindowConfig } from '../config/windowConfig.js';
 import type { WindowManagerConfig } from '../config/windowManagerConfig.js';
 import type { WindowData } from '../types/WindowData.js';
 import { getContext, setContext } from 'svelte';
-import { getVirtualGridState } from './virtualGridState.svelte.js';
 
 export class WindowManager {
 	private windows: WindowData[] = $state([]);
@@ -11,25 +10,23 @@ export class WindowManager {
 	private windowConfig: WindowConfig;
 	private windowManagerConfig: WindowManagerConfig;
 
-	private grid = getVirtualGridState();
-
 	constructor(windowConfig: WindowConfig, windowManagerConfig: WindowManagerConfig) {
 		this.windowConfig = windowConfig;
 		this.windowManagerConfig = windowManagerConfig;
 	}
 
 	public createWindow() {
-		let nearestCell = this.grid.getNearestCell(this.windowManagerConfig.windowSpawnPoint)
-		const topLeft = { ...nearestCell }.topLeft || this.windowManagerConfig.windowSpawnPoint
+		const topLeft = this.windowManagerConfig.windowSpawnPoint;
+		const botRight = {
+			x: this.windowConfig.minWidth + this.windowManagerConfig.windowSpawnPoint.x,
+			y: this.windowConfig.minHeight + this.windowManagerConfig.windowSpawnPoint.y
+		};
 
 		this.windows.push({
 			id: crypto.randomUUID(),
 			panes: [],
-			topLeft: topLeft,
-			botRight: {
-				x: this.windowConfig.minWidth + this.windowManagerConfig.windowSpawnPoint.x,
-				y: this.windowConfig.minHeight + this.windowManagerConfig.windowSpawnPoint.y
-			},
+			topLeft,
+			botRight,
 			zIndex: ++this.maxZIndex
 		});
 	}

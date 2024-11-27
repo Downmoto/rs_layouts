@@ -3,7 +3,6 @@
 	import type { Cell } from './helpers/types/Cell.js';
 	import type { WindowConfig } from './helpers/config/windowConfig.js';
 	import CloseSvg from './helpers/svgs/CloseSVG.svelte';
-	import { getVirtualGridState } from './helpers/state/virtualGridState.svelte.js';
 
 	let {
 		win = $bindable(),
@@ -21,11 +20,8 @@
 		parentHeightConstraint: number;
 	} = $props();
 
-	let snapping = $state(windowConfig.snapOnByDefault);
 	let moving = $state(false);
 	let resizing = $state(false);
-	let grid = getVirtualGridState();
-	let cells: Cell[] = $derived(grid.getCells());
 
 	let startX = 0;
 	let startY = 0;
@@ -49,7 +45,6 @@
 		onClick(win.id);
 		e.stopPropagation();
 		moving = true;
-		grid.show = true;
 		startX = e.clientX;
 		startY = e.clientY;
 		initialTopLeft = { ...win.topLeft };
@@ -61,7 +56,6 @@
 		return (e: MouseEvent) => {
 			e.stopPropagation();
 			resizing = true;
-			grid.show = true;
 			resizeDirection = direction;
 			startX = e.clientX;
 			startY = e.clientY;
@@ -71,14 +65,12 @@
 	}
 
 	function onMouseMove(e: MouseEvent) {
-		const cellWidth: number = snapping ? cells[0].width + grid.gap : 1;
-		const cellHeight: number = snapping ? cells[0].height + grid.gap : 1;
 		if (moving) {
 			const deltaX = e.clientX - startX;
 			const deltaY = e.clientY - startY;
 			// Update both topLeft and botRight to maintain size
-			win.topLeft.x = initialTopLeft.x + Math.round(deltaX / cellWidth) * cellWidth;
-			win.topLeft.y = initialTopLeft.y + Math.round(deltaY / cellHeight) * cellHeight;
+			win.topLeft.x = initialTopLeft.x + deltaX;
+			win.topLeft.y = initialTopLeft.y + deltaY;
 			win.botRight.x = win.topLeft.x + initialWidth;
 			win.botRight.y = win.topLeft.y + initialHeight;
 		}
@@ -95,21 +87,17 @@
 				resizeDirection === 'bottom-right' ||
 				resizeDirection === 'top-right'
 			) {
-				win.botRight.x = snapping
-					? initialBotRight.x + Math.round(deltaX / cellWidth) * cellWidth
-					: initialBotRight.x + deltaX;
+				win.botRight.x = initialBotRight.x + deltaX;
 			}
 			if (
 				resizeDirection === 'left' ||
 				resizeDirection === 'bottom-left' ||
 				resizeDirection === 'top-left'
 			) {
-				const newWidth = snapping
-					? Math.round((initialBotRight.x - (initialTopLeft.x + deltaX)) / cellWidth) * cellWidth
-					: initialBotRight.x - (initialTopLeft.x + deltaX);
+				const newWidth = initialBotRight.x - (initialTopLeft.x + deltaX);
 
 				if (newWidth >= windowConfig.minWidth) {
-					win.topLeft.x = snapping ? initialBotRight.x - newWidth : initialTopLeft.x + deltaX;
+					win.topLeft.x = initialTopLeft.x + deltaX;
 				} else {
 					win.topLeft.x = initialBotRight.x - windowConfig.minWidth;
 				}
@@ -119,21 +107,17 @@
 				resizeDirection === 'bottom-right' ||
 				resizeDirection === 'bottom-left'
 			) {
-				win.botRight.y = snapping
-					? initialBotRight.y + Math.round(deltaY / cellHeight) * cellHeight
-					: initialBotRight.y + deltaY;
+				win.botRight.y = initialBotRight.y + deltaY;
 			}
 			if (
 				resizeDirection === 'top' ||
 				resizeDirection === 'top-right' ||
 				resizeDirection === 'top-left'
 			) {
-				const newHeight = snapping
-					? Math.round((initialBotRight.y - (initialTopLeft.y + deltaY)) / cellHeight) * cellHeight
-					: initialBotRight.y - (initialTopLeft.y + deltaY);
+				const newHeight = initialBotRight.y - (initialTopLeft.y + deltaY);
 
 				if (newHeight >= windowConfig.minHeight) {
-					win.topLeft.y = snapping ? initialBotRight.y - newHeight : initialTopLeft.y + deltaY;
+					win.topLeft.y = initialTopLeft.y + deltaY;
 				} else {
 					win.topLeft.y = initialBotRight.y - windowConfig.minHeight;
 				}
@@ -170,30 +154,8 @@
 			win.topLeft.y = parentHeightConstraint - height; // Maintain height
 		}
 
-		// TODO:
-		// Get the grid cells that the topLeft and botRight points are snapping to
-		if (snapping) {
-			let nearestTopLeftCell = grid.getNearestCell(win.topLeft);
-			if (nearestTopLeftCell) {
-				const newTopLeft = nearestTopLeftCell.topLeft;
-
-				win.topLeft.x = newTopLeft.x;
-				win.topLeft.y = newTopLeft.y;
-
-				win.botRight.x = win.topLeft.x + width;
-				win.botRight.y = win.topLeft.y + height;
-
-				let nearestBotRightCell = grid.getNearestCell(win.botRight);
-				if (nearestBotRightCell) {
-					win.botRight.x = nearestBotRightCell.botRight.x;
-					win.botRight.y = nearestBotRightCell.botRight.y;
-				}
-			}
-		}
-
 		moving = false;
 		resizing = false;
-		// grid.show = false;
 	}
 </script>
 
