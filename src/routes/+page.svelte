@@ -1,28 +1,8 @@
 <script lang="ts">
-	import type { WindowConfig } from '$lib/rsl/configs/windowConfig.js';
-	import type { WindowManagerConfig } from '$lib/rsl/configs/windowManagerConfig.js';
-	import { setWindowManagerState } from '$lib/rsl/states/windowManagerState.svelte.js';
-	import RsLayout from '$lib/rsl/RsLayout.svelte';
-
-	let windowConfig: WindowConfig = {
-		minWidth: 100,
-		minHeight: 100,
-		resizingZoneOverflow: 4
-	};
-
-	let windowManagerConfig: WindowManagerConfig = {
-		windowSpawnPoint: { x: 600, y: 100 }
-	};
-
-	let windowManager = setWindowManagerState(windowConfig, windowManagerConfig);
 </script>
 
 <main>
 	<div class="container">
-		<button onclick={() => windowManager.createWindow()} style:position="absolute">
-			click me
-		</button>
-		<RsLayout {windowConfig} />
 	</div>
 </main>
 
