@@ -1,3 +1,4 @@
-// Reexport your entry components here
-// TODO: IMPORT TYPES FOR EXPORT
 
+import Window from './rsl/Window.svelte';
+
+export {Window}
